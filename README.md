@@ -19,5 +19,5 @@ This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md
 The following repositories were used in the development of this project:
 - [**`wxWidgets`**](https://github.com/wxWidgets/wxWidgets)
 - [**`Halide`**](https://github.com/halide/Halide)
-- [**`wxwidgets-vscode`**](https://github.com/huckor/wxwidgets-vscode)
+- [**`wx_cmake_fetchcontent_template`**](https://github.com/lszl84/wx_cmake_fetchcontent_template)
 
