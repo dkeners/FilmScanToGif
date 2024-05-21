@@ -26,7 +26,17 @@
                 "-DCMAKE_BUILD_TYPE=Debug",
                 "-S.",
                 "-Bbuild",
-            ]
+            ],
+            "windows": {
+                "command": "cmake",
+                "args": [
+                    "-G",
+                    "Visual Studio 16 2019",
+                    "-DCMAKE_BUILD_TYPE=Debug",
+                    "-S.",
+                    "-Bbuild",
+                ]
+            },
         }
     ]
 }
