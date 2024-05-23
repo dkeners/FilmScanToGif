@@ -5,6 +5,8 @@
 #ifndef WX_PRECOMP
     #include <wx/wx.h>
 #endif
+#include <wx/filename.h>
+#include <stdio.h>
 
 class MyApp : public wxApp 
 {
@@ -27,6 +29,13 @@ private:
     void DocumentModified();
 
     void OnImport(wxCommandEvent& event);
+    void ImageImport();
+    void DisplayBitmap(wxStaticBitmap *bitmap, wxString imagepath);
+    void MoveBitmapUp(wxStaticBitmap *bitmap);
+    void MoveBitmapDown(wxStaticBitmap *bitmap);
+    void MoveBitmapLeft(wxStaticBitmap *bitmap);
+    void MoveBitmapRight(wxStaticBitmap *bitmap);
+
     void OnExport(wxCommandEvent& event);
     void OnExit(wxCommandEvent& event);
     void OnUndo(wxCommandEvent& event);
@@ -34,7 +43,15 @@ private:
     void OnAbout(wxCommandEvent& event);
 
     wxString m_filename;
-    wxString m_filepath;
+    wxFileName m_filepath;
+    wxFileName m_imagepath;
+    // wxPanel *m_panel_image;
+    wxStaticBitmap *m_static_bitmap;
+    wxBitmap m_source_bitmap;
+    wxSize m_imagepanel_size = wxSize(1200, 400);
+    wxSize m_image_size = wxSize(1200, 400);
+    double m_image_scale = 1.0;
+    wxPoint m_image_position = wxPoint(0, 0);
     wxString m_app_title = "FilmScanMotion";
     bool m_unsaved_changes = false;
 };
@@ -50,9 +67,9 @@ wxIMPLEMENT_APP(MyApp);
 
 bool MyApp::OnInit()
 {
-    // wxImage::AddHandler( new wxPNGHandler );
-    // wxImage::AddHandler( new wxJPEGHandler );
-    // wxImage::AddHandler( new wxTIFFHandler );
+    wxImage::AddHandler( new wxPNGHandler );
+    wxImage::AddHandler( new wxJPEGHandler );
+    wxImage::AddHandler( new wxTIFFHandler );
 
     MyFrame *frame = new MyFrame();
     frame->Show(true);
@@ -113,8 +130,9 @@ MyFrame::MyFrame() : wxFrame(NULL, wxID_ANY, "FilmScanMotion")
     // App event bindings
     // Bind(wxEVT_CLOSE_WINDOW, &MyFrame::OnExit, this);
     
-    wxPanel *panel_image = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxSize(800, 400), wxBORDER_SIMPLE, "Panel");
+    wxPanel *panel_image = new wxPanel(this, wxID_ANY, wxDefaultPosition, m_imagepanel_size, wxBORDER_SIMPLE, "Panel");
     panel_image->SetBackgroundColour(wxColour(0, 0, 200));
+    m_static_bitmap = new wxStaticBitmap(panel_image, wxID_ANY, wxNullBitmap, m_image_position, m_image_size, wxBORDER_SIMPLE, "Image");
 
     // wxPanel *panel_image_controls = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxSize(800, 50), wxBORDER_SIMPLE, "Overlay");
     // panel_image_controls->SetBackgroundColour(wxColour(200, 0, 0));
@@ -144,6 +162,7 @@ MyFrame::MyFrame() : wxFrame(NULL, wxID_ANY, "FilmScanMotion")
 
     // Import Image
     wxButton *button_upload_image = new wxButton(this, wxID_ANY, "Upload Image", wxDefaultPosition, wxSize(100, 40));
+    button_upload_image->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &MyFrame::ImageImport, this);
 
     wxBoxSizer *sizer_image_controls = new wxBoxSizer(wxHORIZONTAL);
     sizer_image_controls->Add(button_zoom, 0, wxALIGN_CENTER_VERTICAL | wxRIGHT | wxTOP | wxBOTTOM, 5);
@@ -210,23 +229,26 @@ void MyFrame::OnOpen(wxCommandEvent& event)
 
     m_filename = openFileDialog.GetFilename();
     m_filepath = openFileDialog.GetPath();
+
     m_unsaved_changes = false;
     this->SetLabel(m_app_title + " - " + m_filename);
 
-    wxFileInputStream input_stream(m_filepath);
+    wxFileInputStream input_stream(m_filepath.GetFullPath());
 
     if (!input_stream.IsOk())
     {
-        wxLogError("Cannot open file '%s'.", m_filepath);
+        wxLogError("Cannot open file '%s'.", m_filepath.GetFullPath());
         return;
     }
+
+    input_stream.GetFile();
 
     SetStatusText("File opened!");
 }
 
 void MyFrame::OnSave(wxCommandEvent& event)
 {    
-    if (m_filename.IsEmpty())
+    if (!m_filepath.IsOk())
     {
         this->OnSaveAs(event);
         return;
@@ -234,14 +256,25 @@ void MyFrame::OnSave(wxCommandEvent& event)
 
     SetStatusText("Saving file...");
 
-    this->WriteSaveFile(m_filepath);
+    this->WriteSaveFile(m_filepath.GetFullPath());
 }
 
 void MyFrame::OnSaveAs(wxCommandEvent& event)
 {
     SetStatusText("Saving file...");
 
-    wxFileDialog saveFileDialog(this, _("Save XFSM file"), "", "",
+    wxString* filename;
+
+    if (m_filename.IsEmpty())
+    {
+        filename = new wxString("Untitled.xfsm");
+    }
+    else
+    {
+        filename = &m_filename;
+    }
+
+    wxFileDialog saveFileDialog(this, _("Save XFSM file"), "", *filename,
                                 "xfsm files (*.xfsm)|*.xfsm", wxFD_SAVE|wxFD_OVERWRITE_PROMPT);
  
     if (saveFileDialog.ShowModal() == wxID_CANCEL)
@@ -252,10 +285,8 @@ void MyFrame::OnSaveAs(wxCommandEvent& event)
 
     m_filename = saveFileDialog.GetFilename();
     m_filepath = saveFileDialog.GetPath();
-    // save the current contents in the file;
-    // this can be done with e.g. wxWidgets output streams:
 
-    this->WriteSaveFile(m_filepath);
+    this->WriteSaveFile(m_filepath.GetFullPath());
 }
 
 void MyFrame::WriteSaveFile(const wxString& filepath)
@@ -287,16 +318,140 @@ void MyFrame::DocumentModified()
     }
     
     m_unsaved_changes = true;
-    this->SetLabel(m_app_title + " *");
+    this->SetLabel(m_app_title + " - " + m_filename + " *");
 }
 
 void MyFrame::OnImport(wxCommandEvent& event)
 {
     SetStatusText("Importing file...");
-    // Do real importing here
-    wxLogMessage("File imported!");
-    // End of importing
+    
+    // Warn user about image replacement
+    wxMessageDialog dialog(this, "This will replace any currently loaded image.", "Import Image", wxOK | wxCANCEL | wxICON_WARNING);
+    int result = dialog.ShowModal();
+
+    if (result == wxID_CANCEL)
+    {
+        SetStatusText("File import canceled!");
+        return;
+    }
+
+    this->ImageImport();
+}
+
+void MyFrame::ImageImport()
+{
+    wxFileDialog openFileDialog(this, _("Import Image"), "", "",
+                                "Image files (*.jpg;*.png;*.tiff)|*.jpg;*.png;*.tiff;*.tif|JPG files(*.jpg;*.jpeg)|*.jpg;*.jpeg|PNG files (*.png)|*.png|TIFF files (*.tiff)|*.tiff;*.tif", wxFD_OPEN|wxFD_FILE_MUST_EXIST);
+
+    if (openFileDialog.ShowModal() == wxID_CANCEL)
+    {
+        SetStatusText("File open canceled!");
+        return;
+    }
+
+    // if (m_filename.IsEmpty())
+    // {
+    //     m_filename = openFileDialog.GetFilename();
+    //     SetStatusText("Filename: " + m_filename);
+    // }
+
+    m_imagepath = openFileDialog.GetPath();
+    if (m_filename.IsEmpty())
+    {
+        m_filename = m_imagepath.GetName();
+    }
+    m_unsaved_changes = false;
+    // this->SetLabel(m_app_title + " - " + m_filename); // Label will be set in DocumentModified()
+
+    wxFileInputStream input_stream(m_imagepath.GetFullPath());
+
+    if (!input_stream.IsOk())
+    {
+        wxLogError("Cannot open file '%s'.", m_imagepath.GetFullPath());
+        return;
+    }
+
+    this->DisplayBitmap(m_static_bitmap, m_imagepath.GetFullPath());
+
+    // wxImage image;
+    // image.LoadFile(input_stream, wxBITMAP_TYPE_ANY, -1);
+
+    // wxBitmap bitmap(image);
+
+    // wxStaticBitmap *static_bitmap = new wxStaticBitmap(m_panel_image, wxID_ANY, bitmap);
+    // static_bitmap->SetSize(image.GetWidth(), image.GetHeight());
+
+    this->DocumentModified();
+
     SetStatusText("File imported!");
+}
+
+void MyFrame::DisplayBitmap(wxStaticBitmap *bitmapDisplay, wxString l_imagepath)
+{
+    wxImage image;
+    image.LoadFile(l_imagepath);
+
+    wxBitmap newBitmap(image);
+
+    int width = image.GetWidth();
+    int height = image.GetHeight();
+    int panel_width = m_imagepanel_size.GetWidth();
+    int panel_height = m_imagepanel_size.GetHeight();
+    double scale = 1.0;
+
+    if (width > panel_width && height <= panel_height)
+    {
+        scale = panel_width / (double)width;
+    }
+    else if (height > panel_height && width <= panel_width)
+    {
+        scale = panel_height / (double)height;
+    }
+    else if (width > panel_width && height > panel_height)
+    {
+        double scale_width = panel_width / (double)width;
+        double scale_height = panel_height / (double)height;
+        scale = (scale_width < scale_height) ? scale_width : scale_height;
+    }
+
+    m_image_size = wxSize(width, height) * scale;
+
+    m_image_position = wxPoint((panel_width - m_image_size.GetWidth()) / 2, (panel_height - m_image_size.GetHeight()) / 2);
+    
+    wxBitmap::Rescale(newBitmap, m_image_size);
+    // static_bitmap->SetSize(image.GetWidth(), image.GetHeight());
+
+    bitmapDisplay->SetBitmap(newBitmap);
+    bitmapDisplay->SetSize(m_image_size);
+    bitmapDisplay->SetPosition(m_image_position);
+}
+
+void MyFrame::MoveBitmapUp(wxStaticBitmap *bitmapDisplay)
+{
+    wxPoint position = bitmapDisplay->GetPosition();
+    position.y -= 10;
+    bitmapDisplay->SetPosition(position);
+}
+
+void MyFrame::MoveBitmapDown(wxStaticBitmap *bitmapDisplay)
+{
+    wxPoint position = bitmapDisplay->GetPosition();
+    position.y += 10;
+    bitmapDisplay->SetPosition(position);
+}
+
+void MyFrame::MoveBitmapLeft(wxStaticBitmap *bitmapDisplay)
+{
+    wxPoint position = bitmapDisplay->GetPosition();
+    position.x -= 10;
+    bitmapDisplay->SetPosition(position);
+}
+
+void MyFrame::MoveBitmapRight(wxStaticBitmap *bitmapDisplay)
+{
+    wxPoint position = bitmapDisplay->GetPosition();
+    position.x += 10;
+    bitmapDisplay->SetPosition(position);
 }
 
 void MyFrame::OnExport(wxCommandEvent& event)
@@ -310,6 +465,23 @@ void MyFrame::OnExport(wxCommandEvent& event)
 
 void MyFrame::OnExit(wxCommandEvent& event)
 {
+    if (m_unsaved_changes)
+    {
+        // Ask user to save changes
+        wxMessageDialog dialog(this, "Do you want to save changes?", "Save changes", wxYES_NO | wxCANCEL | wxICON_QUESTION);
+        int result = dialog.ShowModal();
+
+        if (result == wxID_YES)
+        {
+            this->OnSave(event);
+        }
+        else if (result == wxID_CANCEL)
+        {
+            SetStatusText("Exit canceled!");
+            return;
+        }
+    }
+
     Close(true);
 }
 
