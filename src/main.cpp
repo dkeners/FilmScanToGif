@@ -162,7 +162,7 @@ MyFrame::MyFrame() : wxFrame(NULL, wxID_ANY, "FilmScanMotion")
 
     // Import Image
     wxButton *button_upload_image = new wxButton(this, wxID_ANY, "Upload Image", wxDefaultPosition, wxSize(100, 40));
-    button_upload_image->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &MyFrame::ImageImport, this);
+    button_upload_image->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &MyFrame::OnImport, this);
 
     wxBoxSizer *sizer_image_controls = new wxBoxSizer(wxHORIZONTAL);
     sizer_image_controls->Add(button_zoom, 0, wxALIGN_CENTER_VERTICAL | wxRIGHT | wxTOP | wxBOTTOM, 5);
