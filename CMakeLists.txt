@@ -18,7 +18,8 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(wxWidgets)
 
-set(SRCS src/main.cpp)
+# add_subdirectory(src)
+set(SRCS src/main.cpp src/tools/BitmapTransforms.cpp)
 
 if(APPLE)
     # create bundle on apple compiles

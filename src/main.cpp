@@ -7,6 +7,10 @@
 #endif
 #include <wx/filename.h>
 #include <stdio.h>
+#include <wx/stdpaths.h>
+
+#include "LoadedImage.h"
+#include "tools/BitmapTransforms.h"
 
 class MyApp : public wxApp 
 {
@@ -26,32 +30,44 @@ private:
     void OnSaveAs(wxCommandEvent& event);
 
     void WriteSaveFile(const wxString& filepath);
-    void DocumentModified();
+    void DocumentModified(bool titleModified = false);
 
     void OnImport(wxCommandEvent& event);
     void ImageImport();
     void DisplayBitmap(wxStaticBitmap *bitmap, wxString imagepath);
-    void MoveBitmapUp(wxStaticBitmap *bitmap);
-    void MoveBitmapDown(wxStaticBitmap *bitmap);
-    void MoveBitmapLeft(wxStaticBitmap *bitmap);
-    void MoveBitmapRight(wxStaticBitmap *bitmap);
+    // void ScaleImage(wxStaticBitmap *bitmap);
+    // void ZoomBitmapIn(wxStaticBitmap *bitmap);
+    // void ZoomBitmapOut(wxStaticBitmap *bitmap);
+    // void MoveBitmapUp(wxStaticBitmap *bitmap);
+    // void MoveBitmapDown(wxStaticBitmap *bitmap);
+    // void MoveBitmapLeft(wxStaticBitmap *bitmap);
+    // void MoveBitmapRight(wxStaticBitmap *bitmap);
 
     void OnExport(wxCommandEvent& event);
     void OnExit(wxCommandEvent& event);
     void OnUndo(wxCommandEvent& event);
     void OnRedo(wxCommandEvent& event);
+    void OnOverlayToggle(wxCommandEvent& event);
     void OnAbout(wxCommandEvent& event);
 
+    wxMenuBar *menuBar;
     wxString m_filename;
     wxFileName m_filepath;
     wxFileName m_imagepath;
+    Image image;
+    BitmapTransforms *bitTrans;
+    // wxImage image;
     // wxPanel *m_panel_image;
     wxStaticBitmap *m_static_bitmap;
     wxBitmap m_source_bitmap;
+    wxStaticBitmap *m_overlay_bitmap;
     wxSize m_imagepanel_size = wxSize(1200, 400);
-    wxSize m_image_size = wxSize(1200, 400);
-    double m_image_scale = 1.0;
-    wxPoint m_image_position = wxPoint(0, 0);
+
+    // wxSize m_image_size = wxSize(1200, 400);
+    // wxSize m_image_scaled_size = wxSize(1200, 400);
+    // double m_image_scale = 1.0;
+    // wxPoint m_image_position = wxPoint(0, 0);
+
     wxString m_app_title = "FilmScanMotion";
     bool m_unsaved_changes = false;
 };
@@ -95,7 +111,8 @@ MyFrame::MyFrame() : wxFrame(NULL, wxID_ANY, "FilmScanMotion")
     menuEdit->Append(wxID_REDO);
 
     wxMenu *menuView = new wxMenu;
-    menuView->Append(ID_Overlay, "&Overlay", "Alignement Overlay Toggle", wxITEM_CHECK);
+    menuView->Append(ID_Overlay, "&Overlay", "Hide Alignement Overlay", wxITEM_CHECK);
+
 
     wxMenu *menuHelp = new wxMenu;
     menuHelp->Append(wxID_ABOUT);
@@ -123,47 +140,69 @@ MyFrame::MyFrame() : wxFrame(NULL, wxID_ANY, "FilmScanMotion")
     Bind(wxEVT_MENU, &MyFrame::OnUndo, this, wxID_UNDO);
     Bind(wxEVT_MENU, &MyFrame::OnRedo, this, wxID_REDO);
     // View menu event bindings
-    // Bind(wxEVT_MENU, &MyFrame::OnOverlay, this, ID_Overlay);
+    Bind(wxEVT_MENU, &MyFrame::OnOverlayToggle, this, ID_Overlay);
     // Help menu event bindings
     Bind(wxEVT_MENU, &MyFrame::OnAbout, this, wxID_ABOUT);
 
     // App event bindings
     // Bind(wxEVT_CLOSE_WINDOW, &MyFrame::OnExit, this);
     
-    wxPanel *panel_image = new wxPanel(this, wxID_ANY, wxDefaultPosition, m_imagepanel_size, wxBORDER_SIMPLE, "Panel");
-    panel_image->SetBackgroundColour(wxColour(0, 0, 200));
-    m_static_bitmap = new wxStaticBitmap(panel_image, wxID_ANY, wxNullBitmap, m_image_position, m_image_size, wxBORDER_SIMPLE, "Image");
+    wxPanel *panel_image = new wxPanel(this, wxID_ANY, wxDefaultPosition, m_imagepanel_size, wxBORDER_NONE, "Panel");
+    panel_image->AlwaysShowScrollbars(true, true);
+    panel_image->SetBackgroundColour(wxColour("WHITE"));
+
+    // wxImage overlay_image;
+    // wxStandardPaths &stdPaths = wxStandardPaths::Get();
+    // overlay_image.LoadFile(stdPaths.GetResourcesDir() + "/rss/Nimslo3DLayout.png");
+    // m_overlay_bitmap = new wxStaticBitmap(panel_image, wxID_ANY, wxNullBitmap, wxPoint(0,0), wxDefaultSize, wxBORDER_NONE, "Overlay");
+    // m_overlay_bitmap->SetBitmap(overlay_image);
+    // m_overlay_bitmap->SetBackgroundColour(wxBG_STYLE_TRANSPARENT);
+    // wxMenuItem* menuItem = menuView->FindItem(ID_Overlay);
+    // if(menuItem != NULL) {
+    //     if (menuItem->IsChecked())
+    //     {
+    //         m_overlay_bitmap->Hide();
+    //     }
+    //     else
+    //     {
+    //         m_overlay_bitmap->Show();
+    //     }
+    // }
+
+    m_static_bitmap = new wxStaticBitmap(panel_image, wxID_ANY, wxNullBitmap, wxDefaultPosition, m_imagepanel_size, wxBORDER_NONE, "Image");
+    m_static_bitmap->SetBackgroundColour(wxColour(wxTransparentColour));
+    m_static_bitmap->Show();
+    wxLogMessage("Static Bitmaps size: %d x %d", m_static_bitmap->GetSize().GetWidth(), m_static_bitmap->GetSize().GetHeight());
+
+
+    
 
     // wxPanel *panel_image_controls = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxSize(800, 50), wxBORDER_SIMPLE, "Overlay");
     // panel_image_controls->SetBackgroundColour(wxColour(200, 0, 0));
 
-    // Button Controls
+    // BUTTON CONTROLS
     wxButton *button_zoom = new wxButton(this, wxID_ANY, "+", wxDefaultPosition, wxSize(40, 40));
-    button_zoom->SetBackgroundColour(wxColour(0, 200, 0));
-
     wxButton *button_zoom_out = new wxButton(this, wxID_ANY, "-", wxDefaultPosition, wxSize(40, 40));
-    button_zoom_out->SetBackgroundColour(wxColour(200, 0, 0));
+    button_zoom->Bind(wxEVT_COMMAND_BUTTON_CLICKED, [this](wxCommandEvent& event) { bitTrans->ZoomIn(m_static_bitmap, &image); });
+    button_zoom_out->Bind(wxEVT_COMMAND_BUTTON_CLICKED, [this](wxCommandEvent& event) { bitTrans->ZoomOut(m_static_bitmap, &image); });
 
     wxButton *button_left = new wxButton(this, wxID_ANY, "<", wxDefaultPosition, wxSize(40, 40));
-    button_left->SetBackgroundColour(wxColour(0, 200, 0));
-
     wxButton *button_right = new wxButton(this, wxID_ANY, ">", wxDefaultPosition, wxSize(40, 40));
-    button_right->SetBackgroundColour(wxColour(200, 0, 0));
-
     wxButton *button_up = new wxButton(this, wxID_ANY, "^", wxDefaultPosition, wxSize(40, 40));
-    button_up->SetBackgroundColour(wxColour(0, 200, 0));
-
     wxButton *button_down = new wxButton(this, wxID_ANY, "v", wxDefaultPosition, wxSize(40, 40));
-    button_down->SetBackgroundColour(wxColour(200, 0, 0));
+    button_left->Bind(wxEVT_COMMAND_BUTTON_CLICKED, [this](wxCommandEvent& event) { bitTrans->MoveLeft(m_static_bitmap); });
+    button_right->Bind(wxEVT_COMMAND_BUTTON_CLICKED, [this](wxCommandEvent& event) { bitTrans->MoveRight(m_static_bitmap); });
+    button_up->Bind(wxEVT_COMMAND_BUTTON_CLICKED, [this](wxCommandEvent& event) { bitTrans->MoveUp(m_static_bitmap); });
+    button_down->Bind(wxEVT_COMMAND_BUTTON_CLICKED, [this](wxCommandEvent& event) { bitTrans->MoveDown(m_static_bitmap); });
 
     wxButton *button_rotate_left = new wxButton(this, wxID_ANY, "↺", wxDefaultPosition, wxSize(40, 40));
-
     wxButton *button_rotate_right = new wxButton(this, wxID_ANY, "↻", wxDefaultPosition, wxSize(40, 40));
 
     // Import Image
     wxButton *button_upload_image = new wxButton(this, wxID_ANY, "Upload Image", wxDefaultPosition, wxSize(100, 40));
     button_upload_image->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &MyFrame::OnImport, this);
 
+    // Button Controls Sizer
     wxBoxSizer *sizer_image_controls = new wxBoxSizer(wxHORIZONTAL);
     sizer_image_controls->Add(button_zoom, 0, wxALIGN_CENTER_VERTICAL | wxRIGHT | wxTOP | wxBOTTOM, 5);
     sizer_image_controls->Add(button_zoom_out, 0, wxALIGN_CENTER_VERTICAL | wxRIGHT | wxTOP | wxBOTTOM, 5);
@@ -179,7 +218,10 @@ MyFrame::MyFrame() : wxFrame(NULL, wxID_ANY, "FilmScanMotion")
     sizer_image_controls->AddStretchSpacer();
 
     sizer_image_controls->Add(button_upload_image, 0, wxALIGN_CENTER_VERTICAL | wxTOP | wxBOTTOM, 5);
-    // End of Button Controls
+    // END BUTTON CONTROLS
+
+    // IMAGE SELECTOR CONTROLS
+
 
     wxBoxSizer *sizer = new wxBoxSizer(wxVERTICAL);
     sizer->Add(panel_image, 0, wxEXPAND | wxALL, 10);
@@ -310,9 +352,9 @@ void MyFrame::WriteSaveFile(const wxString& filepath)
     SetStatusText("File saved as " + m_filename + "!");
 }
 
-void MyFrame::DocumentModified()
+void MyFrame::DocumentModified(bool titleModified)
 {
-    if (m_unsaved_changes)
+    if (m_unsaved_changes && !titleModified)
     {
         return;
     }
@@ -356,102 +398,26 @@ void MyFrame::ImageImport()
     // }
 
     m_imagepath = openFileDialog.GetPath();
-    if (m_filename.IsEmpty())
+
+    // wxFileInputStream input_stream(m_imagepath.GetFullPath());
+
+    // if (!input_stream.IsOk())
+    // {
+    //     wxLogError("Cannot open file '%s'.", m_imagepath.GetFullPath());
+    //     return;
+    // }
+
+    image.setPanelSize(m_imagepanel_size);
+    image.LoadAndScaleImage(m_imagepath.GetFullPath(), m_static_bitmap);
+
+    if (!m_filepath.IsOk())
     {
         m_filename = m_imagepath.GetName();
     }
-    m_unsaved_changes = false;
-    // this->SetLabel(m_app_title + " - " + m_filename); // Label will be set in DocumentModified()
 
-    wxFileInputStream input_stream(m_imagepath.GetFullPath());
-
-    if (!input_stream.IsOk())
-    {
-        wxLogError("Cannot open file '%s'.", m_imagepath.GetFullPath());
-        return;
-    }
-
-    this->DisplayBitmap(m_static_bitmap, m_imagepath.GetFullPath());
-
-    // wxImage image;
-    // image.LoadFile(input_stream, wxBITMAP_TYPE_ANY, -1);
-
-    // wxBitmap bitmap(image);
-
-    // wxStaticBitmap *static_bitmap = new wxStaticBitmap(m_panel_image, wxID_ANY, bitmap);
-    // static_bitmap->SetSize(image.GetWidth(), image.GetHeight());
-
-    this->DocumentModified();
+    this->DocumentModified(true);
 
     SetStatusText("File imported!");
-}
-
-void MyFrame::DisplayBitmap(wxStaticBitmap *bitmapDisplay, wxString l_imagepath)
-{
-    wxImage image;
-    image.LoadFile(l_imagepath);
-
-    wxBitmap newBitmap(image);
-
-    int width = image.GetWidth();
-    int height = image.GetHeight();
-    int panel_width = m_imagepanel_size.GetWidth();
-    int panel_height = m_imagepanel_size.GetHeight();
-    double scale = 1.0;
-
-    if (width > panel_width && height <= panel_height)
-    {
-        scale = panel_width / (double)width;
-    }
-    else if (height > panel_height && width <= panel_width)
-    {
-        scale = panel_height / (double)height;
-    }
-    else if (width > panel_width && height > panel_height)
-    {
-        double scale_width = panel_width / (double)width;
-        double scale_height = panel_height / (double)height;
-        scale = (scale_width < scale_height) ? scale_width : scale_height;
-    }
-
-    m_image_size = wxSize(width, height) * scale;
-
-    m_image_position = wxPoint((panel_width - m_image_size.GetWidth()) / 2, (panel_height - m_image_size.GetHeight()) / 2);
-    
-    wxBitmap::Rescale(newBitmap, m_image_size);
-    // static_bitmap->SetSize(image.GetWidth(), image.GetHeight());
-
-    bitmapDisplay->SetBitmap(newBitmap);
-    bitmapDisplay->SetSize(m_image_size);
-    bitmapDisplay->SetPosition(m_image_position);
-}
-
-void MyFrame::MoveBitmapUp(wxStaticBitmap *bitmapDisplay)
-{
-    wxPoint position = bitmapDisplay->GetPosition();
-    position.y -= 10;
-    bitmapDisplay->SetPosition(position);
-}
-
-void MyFrame::MoveBitmapDown(wxStaticBitmap *bitmapDisplay)
-{
-    wxPoint position = bitmapDisplay->GetPosition();
-    position.y += 10;
-    bitmapDisplay->SetPosition(position);
-}
-
-void MyFrame::MoveBitmapLeft(wxStaticBitmap *bitmapDisplay)
-{
-    wxPoint position = bitmapDisplay->GetPosition();
-    position.x -= 10;
-    bitmapDisplay->SetPosition(position);
-}
-
-void MyFrame::MoveBitmapRight(wxStaticBitmap *bitmapDisplay)
-{
-    wxPoint position = bitmapDisplay->GetPosition();
-    position.x += 10;
-    bitmapDisplay->SetPosition(position);
 }
 
 void MyFrame::OnExport(wxCommandEvent& event)
@@ -503,6 +469,25 @@ void MyFrame::OnRedo(wxCommandEvent& event)
     this->DocumentModified();
     // End of redo
     SetStatusText("Last action redone!");
+}
+
+void MyFrame::OnOverlayToggle(wxCommandEvent& event)
+{
+    SetStatusText("Toggling overlay...");
+    // Do real overlay toggle here
+    wxMenuItem* menuItem = menuBar->FindItem(ID_Overlay);
+    if(menuItem != NULL) {
+        if (menuItem->IsChecked())
+        {
+            m_overlay_bitmap->Show();
+        }
+        else
+        {
+            m_overlay_bitmap->Hide();
+        }
+    }
+    // End of overlay toggle
+    SetStatusText("Overlay toggled!");
 }
 
 void MyFrame::OnAbout(wxCommandEvent& event)
