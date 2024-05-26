@@ -35,13 +35,6 @@ private:
     void OnImport(wxCommandEvent& event);
     void ImageImport();
     void DisplayBitmap(wxStaticBitmap *bitmap, wxString imagepath);
-    // void ScaleImage(wxStaticBitmap *bitmap);
-    // void ZoomBitmapIn(wxStaticBitmap *bitmap);
-    // void ZoomBitmapOut(wxStaticBitmap *bitmap);
-    // void MoveBitmapUp(wxStaticBitmap *bitmap);
-    // void MoveBitmapDown(wxStaticBitmap *bitmap);
-    // void MoveBitmapLeft(wxStaticBitmap *bitmap);
-    // void MoveBitmapRight(wxStaticBitmap *bitmap);
 
     void OnExport(wxCommandEvent& event);
     void OnExit(wxCommandEvent& event);
@@ -56,17 +49,11 @@ private:
     wxFileName m_imagepath;
     Image image;
     BitmapTransforms *bitTrans;
-    // wxImage image;
-    // wxPanel *m_panel_image;
+
     wxStaticBitmap *m_static_bitmap;
     wxBitmap m_source_bitmap;
     wxStaticBitmap *m_overlay_bitmap;
     wxSize m_imagepanel_size = wxSize(1200, 400);
-
-    // wxSize m_image_size = wxSize(1200, 400);
-    // wxSize m_image_scaled_size = wxSize(1200, 400);
-    // double m_image_scale = 1.0;
-    // wxPoint m_image_position = wxPoint(0, 0);
 
     wxString m_app_title = "FilmScanMotion";
     bool m_unsaved_changes = false;
@@ -94,6 +81,7 @@ bool MyApp::OnInit()
 
 MyFrame::MyFrame() : wxFrame(NULL, wxID_ANY, "FilmScanMotion")
 {
+    // MENU BAR
     wxMenu *menuFile = new wxMenu;
     menuFile->Append(wxID_NEW);
     menuFile->Append(wxID_OPEN);
@@ -123,11 +111,9 @@ MyFrame::MyFrame() : wxFrame(NULL, wxID_ANY, "FilmScanMotion")
     menuBar->Append(menuView, "&View");
     menuBar->Append(menuHelp, "&Help");
     SetMenuBar( menuBar );
+    // END MENU BAR
 
-    CreateStatusBar();
-
-    SetStatusText("Welcome to FilmScanMotion!");
-
+    // START MENU BAR EVENT BINDINGS
     // File menu event bindings
     Bind(wxEVT_MENU, &MyFrame::OnNew, this, wxID_NEW);
     Bind(wxEVT_MENU, &MyFrame::OnOpen, this, wxID_OPEN);
@@ -143,9 +129,13 @@ MyFrame::MyFrame() : wxFrame(NULL, wxID_ANY, "FilmScanMotion")
     Bind(wxEVT_MENU, &MyFrame::OnOverlayToggle, this, ID_Overlay);
     // Help menu event bindings
     Bind(wxEVT_MENU, &MyFrame::OnAbout, this, wxID_ABOUT);
+    // END MENU BAR EVENT BINDINGS
+    
+    // INIT APP STATUS BAR
+    CreateStatusBar();
 
-    // App event bindings
-    // Bind(wxEVT_CLOSE_WINDOW, &MyFrame::OnExit, this);
+    SetStatusText("Welcome to FilmScanMotion!");
+    // END INIT APP STATUS BAR
     
     wxPanel *panel_image = new wxPanel(this, wxID_ANY, wxDefaultPosition, m_imagepanel_size, wxBORDER_NONE, "Panel");
     panel_image->AlwaysShowScrollbars(true, true);
@@ -173,12 +163,6 @@ MyFrame::MyFrame() : wxFrame(NULL, wxID_ANY, "FilmScanMotion")
     m_static_bitmap->SetBackgroundColour(wxColour(wxTransparentColour));
     m_static_bitmap->Show();
     wxLogMessage("Static Bitmaps size: %d x %d", m_static_bitmap->GetSize().GetWidth(), m_static_bitmap->GetSize().GetHeight());
-
-
-    
-
-    // wxPanel *panel_image_controls = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxSize(800, 50), wxBORDER_SIMPLE, "Overlay");
-    // panel_image_controls->SetBackgroundColour(wxColour(200, 0, 0));
 
     // BUTTON CONTROLS
     wxButton *button_zoom = new wxButton(this, wxID_ANY, "+", wxDefaultPosition, wxSize(40, 40));
@@ -391,21 +375,7 @@ void MyFrame::ImageImport()
         return;
     }
 
-    // if (m_filename.IsEmpty())
-    // {
-    //     m_filename = openFileDialog.GetFilename();
-    //     SetStatusText("Filename: " + m_filename);
-    // }
-
     m_imagepath = openFileDialog.GetPath();
-
-    // wxFileInputStream input_stream(m_imagepath.GetFullPath());
-
-    // if (!input_stream.IsOk())
-    // {
-    //     wxLogError("Cannot open file '%s'.", m_imagepath.GetFullPath());
-    //     return;
-    // }
 
     image.setPanelSize(m_imagepanel_size);
     image.LoadAndScaleImage(m_imagepath.GetFullPath(), m_static_bitmap);
