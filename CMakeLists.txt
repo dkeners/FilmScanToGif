@@ -19,11 +19,11 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(wxWidgets)
 
 # add_subdirectory(src)
-set(SRCS src/main.cpp src/tools/BitmapTransforms.cpp)
+set(ENTRY src/main.cpp)
 
 if(APPLE)
     # create bundle on apple compiles
-    add_executable(main MACOSX_BUNDLE ${SRCS})
+    add_executable(main MACOSX_BUNDLE ${ENTRY})
 
     # Set a custom plist file for the app bundle - needed for Mac OS Retina display
     set_target_properties(main PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${CMAKE_CURRENT_SOURCE_DIR}/Info.plist)
@@ -31,7 +31,10 @@ else()
     # the WIN32 is needed for Windows in order for it to look for WinMain
     # instead of the main function. This is ignored on other systems,
     # so it works on all platforms
-    add_executable(main WIN32 ${SRCS} main.exe.manifest)
+    add_executable(main WIN32 ${ENTRY} main.exe.manifest)
 endif()
+
+# Recursively add all files in the src directory to the executable
+add_subdirectory(src)
 
 target_link_libraries(main PRIVATE wxcore wxnet)

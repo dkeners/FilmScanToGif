@@ -16,9 +16,7 @@ public:
     double m_scale;
 
     // Constructors
-    Image() : wxImage() {
-        // Default constructor
-    }
+    Image();
 
     /**
      * @brief Constructs an Image object.
@@ -31,125 +29,65 @@ public:
      * @param scaledSize The scaled size of the image.
      * @param scale The scale factor of the image.
      */
-    Image(const wxString &filename, wxPoint position = wxPoint(0, 0), wxSize imageSize = wxSize(1200, 400), wxSize scaledSize = wxSize(1200, 400), double scale = 1.0)
-        : m_filename(filename), m_position(position), m_fullSize(imageSize), m_scaledSize(scaledSize), m_scale(scale) {
-        // Load the image from the file
-        LoadFile(filename);
-    }
+    Image(const wxString &filename, wxPoint position = wxPoint(0, 0), wxSize imageSize = wxSize(1200, 400), wxSize scaledSize = wxSize(1200, 400), double scale = 1.0);
 
     // Getters
-    wxString getFilename() const {
-        return m_filename;
-    }
+    wxString getFilename() const;
 
-    wxPoint getPosition() const {
-        return m_position;
-    }
+    wxPoint getPosition() const;
 
-    int getPositionX() const {
-        return m_position.x;
-    }
+    int getPositionX() const;
 
-    int getPositionY() const {
-        return m_position.y;
-    }
+    int getPositionY() const;
 
-    wxSize getPanelSize() const {
-        return m_panelSize;
-    }
+    wxSize getPanelSize() const;
 
-    int getPanelWidth() const {
-        return m_panelSize.x;
-    }
+    int getPanelWidth() const;
 
-    int getPanelHeight() const {
-        return m_panelSize.y;
-    }
+    int getPanelHeight() const;
 
-    wxSize getFullSize() const {
-        return m_fullSize;
-    }
+    wxSize getFullSize() const;
 
-    int getFullWidth() const {
-        return m_fullSize.x;
-    }
+    int getFullWidth() const;
 
-    int getFullHeight() const {
-        return m_fullSize.y;
-    }
+    int getFullHeight() const;
 
-    wxSize getScaledSize() const {
-        return m_scaledSize;
-    }
+    wxSize getScaledSize() const;
 
-    int getScaledWidth() const {
-        return m_scaledSize.x;
-    }
+    int getScaledWidth() const;
 
-    int getScaledHeight() const {
-        return m_scaledSize.y;
-    }
+    int getScaledHeight() const;
 
-    double getScale() const {
-        return m_scale;
-    }
+    double getScale() const;
 
     // Setters
-    void setFilename(const wxString &filename) {
-        m_filename = filename;
-    }
+    void setFilename(const wxString &filename);
 
-    void setPosition(const wxPoint &position) {
-        m_position = position;
-    }
+    void setPosition(const wxPoint &position);
 
-    void setPosition(int x, int y) {
-        m_position = wxPoint(x, y);
-    }
+    void setPosition(int x, int y);
 
-    void setPanelSize(const wxSize &size) {
-        m_panelSize = size;
-    }
+    void setPanelSize(const wxSize &size);
 
-    void setPanelSize(int width, int height) {
-        m_panelSize = wxSize(width, height);
-    }
+    void setPanelSize(int width, int height);
 
-    void setFullSize(const wxSize &size) {
-        m_fullSize = size;
-    }
+    void setFullSize(const wxSize &size);
 
-    void setFullSize(int width, int height) {
-        m_fullSize = wxSize(width, height);
-    }
+    void setFullSize(int width, int height);
 
-    void setFullWidth(int width) {
-        m_fullSize.x = width;
-    }
+    void setFullWidth(int width);
 
-    void setFullHeight(int height) {
-        m_fullSize.y = height;
-    }
+    void setFullHeight(int height);
 
-    void setScaledSize(const wxSize &size) {
-        m_scaledSize = size;
-    }
+    void setScaledSize(const wxSize &size);
 
-    void setScaledSize(int width, int height) {
-        m_scaledSize = wxSize(width, height);
-    }
+    void setScaledSize(int width, int height);
 
-    void setScaledWidth(int width) {
-        m_scaledSize.x = width;
-    }
+    void setScaledWidth(int width);
 
-    void setScaledHeight(int height) {
-        m_scaledSize.y = height;
-    }
+    void setScaledHeight(int height);
 
-    void setScale(double scale) {
-        m_scale = scale;
-    }
+    void setScale(double scale);
 
     // Public methods
     /**
@@ -158,19 +96,7 @@ public:
      * 
      * @param bitmapDisplay The wxStaticBitmap object used to display the image.
      */
-    void ScaleImage(wxStaticBitmap *bitmapDisplay)
-    {
-        m_scaledSize = m_fullSize * m_scale;
-
-        m_position = wxPoint((m_panelSize.x - m_scaledSize.x) / 2, (m_panelSize.y - m_scaledSize.y) / 2);
-        
-        wxImage scaledImage = (*this).Copy();
-        scaledImage.Rescale(m_scaledSize.GetWidth(), m_scaledSize.GetHeight(), wxIMAGE_QUALITY_HIGH);
-
-        bitmapDisplay->SetBitmap(scaledImage);
-        bitmapDisplay->SetSize(m_scaledSize);
-        bitmapDisplay->SetPosition(m_position);
-    }
+    void ScaleImage(wxStaticBitmap *bitmapDisplay);
 
     /**
      * Loads and scales an image file to fit within the specified wxStaticBitmap control.
@@ -178,48 +104,7 @@ public:
      * @param filename The path to the image file to load.
      * @param bitmapDisplay The wxStaticBitmap control to display the scaled image.
      */
-    void LoadAndScaleImage(wxString filename, wxStaticBitmap *bitmapDisplay)
-    {
-        m_filename = filename;
-        LoadFile(m_filename);
-
-        m_fullSize = GetSize();
-        int width = m_fullSize.x;
-        int height = m_fullSize.y;
-
-        // Check if the panel size is fully specified. TODO: Find a better way to handle this.
-        if (m_panelSize == wxSize(0, 0))
-        {
-            throw std::runtime_error("Panel size is not fully specified in Image.");
-        }
-        
-        int panelWidth = m_panelSize.x;
-        int panelHeight = m_panelSize.y;
-
-        m_scale = 1.0;
-        
-        if (width > panelWidth && height > panelHeight)
-        {
-            double scale_width = panelWidth / (double)width;
-            double scale_height = panelHeight / (double)height;
-            m_scale = (scale_width < scale_height) ? scale_width : scale_height;
-        } else if (height > panelHeight)
-        {
-            m_scale = panelHeight / (double)height;
-        } else if (width > panelWidth)
-        {
-            m_scale = panelWidth / (double)width;
-        }
-
-        ScaleImage(bitmapDisplay);
-    }
-
-    // Destructor
-    // ~Image() : ~wxImage() {
-    //     // Clean up
-    //     // ...
-    //     this->Destroy();
-    // }
+    void LoadAndScaleImage(wxString filename, wxStaticBitmap *bitmapDisplay);
 
 private:
     wxString m_filename;
