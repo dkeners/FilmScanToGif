@@ -48,7 +48,6 @@ private:
     wxFileName m_filepath;
     wxFileName m_imagepath;
     Image image;
-    BitmapTransforms *bitTrans;
 
     wxStaticBitmap *m_static_bitmap;
     wxBitmap m_source_bitmap;
@@ -167,17 +166,17 @@ MyFrame::MyFrame() : wxFrame(NULL, wxID_ANY, "FilmScanMotion")
     // BUTTON CONTROLS
     wxButton *button_zoom = new wxButton(this, wxID_ANY, "+", wxDefaultPosition, wxSize(40, 40));
     wxButton *button_zoom_out = new wxButton(this, wxID_ANY, "-", wxDefaultPosition, wxSize(40, 40));
-    button_zoom->Bind(wxEVT_COMMAND_BUTTON_CLICKED, [this](wxCommandEvent& event) { bitTrans->ZoomIn(m_static_bitmap, &image); });
-    button_zoom_out->Bind(wxEVT_COMMAND_BUTTON_CLICKED, [this](wxCommandEvent& event) { bitTrans->ZoomOut(m_static_bitmap, &image); });
+    button_zoom->Bind(wxEVT_COMMAND_BUTTON_CLICKED, [this](wxCommandEvent& event) { BitmapTransforms::zoomIn(m_static_bitmap, &image); });
+    button_zoom_out->Bind(wxEVT_COMMAND_BUTTON_CLICKED, [this](wxCommandEvent& event) { BitmapTransforms::zoomOut(m_static_bitmap, &image); });
 
     wxButton *button_left = new wxButton(this, wxID_ANY, "<", wxDefaultPosition, wxSize(40, 40));
     wxButton *button_right = new wxButton(this, wxID_ANY, ">", wxDefaultPosition, wxSize(40, 40));
     wxButton *button_up = new wxButton(this, wxID_ANY, "^", wxDefaultPosition, wxSize(40, 40));
     wxButton *button_down = new wxButton(this, wxID_ANY, "v", wxDefaultPosition, wxSize(40, 40));
-    button_left->Bind(wxEVT_COMMAND_BUTTON_CLICKED, [this](wxCommandEvent& event) { bitTrans->MoveLeft(m_static_bitmap); });
-    button_right->Bind(wxEVT_COMMAND_BUTTON_CLICKED, [this](wxCommandEvent& event) { bitTrans->MoveRight(m_static_bitmap); });
-    button_up->Bind(wxEVT_COMMAND_BUTTON_CLICKED, [this](wxCommandEvent& event) { bitTrans->MoveUp(m_static_bitmap); });
-    button_down->Bind(wxEVT_COMMAND_BUTTON_CLICKED, [this](wxCommandEvent& event) { bitTrans->MoveDown(m_static_bitmap); });
+    button_left->Bind(wxEVT_COMMAND_BUTTON_CLICKED, [this](wxCommandEvent& event) { BitmapTransforms::moveLeft(m_static_bitmap); });
+    button_right->Bind(wxEVT_COMMAND_BUTTON_CLICKED, [this](wxCommandEvent& event) { BitmapTransforms::moveRight(m_static_bitmap); });
+    button_up->Bind(wxEVT_COMMAND_BUTTON_CLICKED, [this](wxCommandEvent& event) { BitmapTransforms::moveUp(m_static_bitmap); });
+    button_down->Bind(wxEVT_COMMAND_BUTTON_CLICKED, [this](wxCommandEvent& event) { BitmapTransforms::moveDown(m_static_bitmap); });
 
     wxButton *button_rotate_left = new wxButton(this, wxID_ANY, "↺", wxDefaultPosition, wxSize(40, 40));
     wxButton *button_rotate_right = new wxButton(this, wxID_ANY, "↻", wxDefaultPosition, wxSize(40, 40));

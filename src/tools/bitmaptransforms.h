@@ -3,13 +3,12 @@
 #include <wx/wx.h>
 #include "../LoadedImage.h"
 
-class BitmapTransforms
+namespace BitmapTransforms
 {
-public:
-    void ZoomIn(wxStaticBitmap *bitmapDisplay, Image *image);
-    void ZoomOut(wxStaticBitmap *bitmapDisplay, Image *image);
-    void MoveLeft(wxStaticBitmap *bitmapDisplay);
-    void MoveRight(wxStaticBitmap *bitmapDisplay);
-    void MoveUp(wxStaticBitmap *bitmapDisplay);
-    void MoveDown(wxStaticBitmap *bitmapDisplay);
+    void zoomIn(wxStaticBitmap *bitmapDisplay, Image *image);
+    void zoomOut(wxStaticBitmap *bitmapDisplay, Image *image);
+    void moveLeft(wxStaticBitmap *bitmapDisplay);
+    void moveRight(wxStaticBitmap *bitmapDisplay);
+    void moveUp(wxStaticBitmap *bitmapDisplay);
+    void moveDown(wxStaticBitmap *bitmapDisplay);
 };

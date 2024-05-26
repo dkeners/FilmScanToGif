@@ -1,40 +1,40 @@
 #include "BitmapTransforms.h"
 #include "../LoadedImage.h"
 
-void BitmapTransforms::ZoomIn(wxStaticBitmap *bitmapDisplay, Image *image)
+void BitmapTransforms::zoomIn(wxStaticBitmap *bitmapDisplay, Image *image)
 {
     image->m_scale *= 1.1;
     image->ScaleImage(bitmapDisplay);
 }
 
-void BitmapTransforms::ZoomOut(wxStaticBitmap *bitmapDisplay, Image *image)
+void BitmapTransforms::zoomOut(wxStaticBitmap *bitmapDisplay, Image *image)
 {
     image->m_scale *= 0.9;
     image->ScaleImage(bitmapDisplay);
 }
 
-void BitmapTransforms::MoveLeft(wxStaticBitmap *bitmapDisplay)
+void BitmapTransforms::moveLeft(wxStaticBitmap *bitmapDisplay)
 {
     wxPoint position = bitmapDisplay->GetPosition();
     position.x -= 10;
     bitmapDisplay->SetPosition(position);
 }
 
-void BitmapTransforms::MoveRight(wxStaticBitmap *bitmapDisplay)
+void BitmapTransforms::moveRight(wxStaticBitmap *bitmapDisplay)
 {
     wxPoint position = bitmapDisplay->GetPosition();
     position.x += 10;
     bitmapDisplay->SetPosition(position);
 }
 
-void BitmapTransforms::MoveUp(wxStaticBitmap *bitmapDisplay)
+void BitmapTransforms::moveUp(wxStaticBitmap *bitmapDisplay)
 {
     wxPoint position = bitmapDisplay->GetPosition();
     position.y -= 10;
     bitmapDisplay->SetPosition(position);
 }
 
-void BitmapTransforms::MoveDown(wxStaticBitmap *bitmapDisplay)
+void BitmapTransforms::moveDown(wxStaticBitmap *bitmapDisplay)
 {
     wxPoint position = bitmapDisplay->GetPosition();
     position.y += 10;
