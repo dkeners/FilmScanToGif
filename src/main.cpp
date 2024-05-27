@@ -438,6 +438,12 @@ void MyFrame::OnRedo(wxCommandEvent& event)
     SetStatusText("Redoing last action...");
     // Do real redo here
     wxLogMessage("Last action redone!");
+    if (layout_manager.loadLayout("Nimslo 3D")) {
+        wxLogMessage("Loaded set layout: %s", layout_manager.defaultLayout_);
+    }
+    if (layout_manager.loadLayout()) {
+        wxLogMessage("Loaded default layout: %s", layout_manager.defaultLayout_);
+    }
     this->DocumentModified();
     // End of redo
     SetStatusText("Last action redone!");
