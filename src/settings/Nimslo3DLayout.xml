@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<layout>
+	<cameraInfo>
+		<name>Nimslo 3D</name>
+		<frames>4</frames>
+        <layoutSize>
+            <width>1200</width>
+            <height>400</height>
+        </layoutSize>
+		<frameTiming>
+		    <default>
+		        100
+		    </default>
+		    <a1>
+                150
+            </a1>
+		</frameTiming>
+        <animationOrder>
+            <default>
+                <totalFrames>6</totalFrames>
+                <frame>1</frame>
+                <frame>2</frame>
+                <frame>3</frame>
+                <frame>4</frame>
+                <frame>3</frame>
+                <frame>2</frame>
+            </default>
+        </animationOrder>
+	</cameraInfo>
+	<frame>
+        <name>Frame 1</name>
+        <bounds>
+            <x1>5</x1>
+            <y1>25</y1>
+            <width>290</width>
+            <height>350</height>
+        </bounds>
+    </frame>
+    <frame>
+        <name>Frame 2</name>
+        <bounds>
+            <x1>300</x1>
+            <y1>25</y1>
+            <width>290</width>
+            <height>350</height>
+        </bounds>
+    </frame>
+    <frame>
+        <name>Frame 3</name>
+        <bounds>
+            <x1>595</x1>
+            <y1>25</y1>
+            <width>290</width>
+            <height>350</height>
+        </bounds>
+    </frame>
+    <frame>
+        <name>Frame 4</name>
+        <bounds>
+            <x1>890</x1>
+            <y1>25</y1>
+            <width>290</width>
+            <height>350</height>
+        </bounds>
+    </frame>
+</layout>
