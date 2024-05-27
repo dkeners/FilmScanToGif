@@ -11,6 +11,7 @@
 
 #include "LoadedImage.h"
 #include "tools/BitmapTransforms.h"
+#include "tools/layoutmanager.h"
 
 class MyApp : public wxApp 
 {
@@ -42,6 +43,8 @@ private:
     void OnRedo(wxCommandEvent& event);
     void OnOverlayToggle(wxCommandEvent& event);
     void OnAbout(wxCommandEvent& event);
+
+    LayoutManager layout_manager;
 
     wxMenuBar *menuBar;
     wxString m_filename;

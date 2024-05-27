@@ -37,4 +37,4 @@ endif()
 # Recursively add all files in the src directory to the executable
 add_subdirectory(src)
 
-target_link_libraries(main PRIVATE wxcore wxnet)
+target_link_libraries(main PRIVATE wxcore wxnet wxxml)
