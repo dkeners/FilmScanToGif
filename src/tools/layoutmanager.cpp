@@ -144,25 +144,34 @@ bool LayoutManager::loadLayout(wxString layoutName)
             }
         }
         // Frame Node Logic (name, x, y, width, height)
-        else if (layoutNode->GetName() == "frame") {
+        else if (layoutNode->GetName() == "frameInfo") {
             wxXmlNode *frame = layoutNode->GetChildren();
             while (frame)
             {
                 wxLogMessage("Frame: %s", frame->GetAttribute("name"));
+                wxString name = frame->GetAttribute("name");
+                int x, y, width, height;
+
                 wxXmlNode *frameInfo = frame->GetChildren();
                 while (frameInfo)
                 {
                     if (frameInfo->GetName() == "x") {
+                        x = wxAtoi(frameInfo->GetNodeContent());
                         wxLogMessage("X: %s", frameInfo->GetNodeContent());
                     } else if (frameInfo->GetName() == "y") {
+                        y = wxAtoi(frameInfo->GetNodeContent());
                         wxLogMessage("Y: %s", frameInfo->GetNodeContent());
                     } else if (frameInfo->GetName() == "width") {
+                        width = wxAtoi(frameInfo->GetNodeContent());
                         wxLogMessage("Width: %s", frameInfo->GetNodeContent());
                     } else if (frameInfo->GetName() == "height") {
+                        height = wxAtoi(frameInfo->GetNodeContent());
                         wxLogMessage("Height: %s", frameInfo->GetNodeContent());
                     }
                     frameInfo = frameInfo->GetNext();
                 }
+                frames_[name] = SubBmpRect(x, y, width, height);
+                wxLogMessage("Frame: %i, %i, %i, %i", frames_[name].GetX(), frames_[name].GetY(), frames_[name].GetWidth(), frames_[name].GetHeight());
                 frame = frame->GetNext();
             }
         }

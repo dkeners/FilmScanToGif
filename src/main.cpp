@@ -9,8 +9,8 @@
 #include <stdio.h>
 #include <wx/stdpaths.h>
 
-#include "LoadedImage.h"
-#include "tools/BitmapTransforms.h"
+#include "loadedimage.h"
+#include "tools/bitmaptransforms.h"
 #include "tools/layoutmanager.h"
 
 class MyApp : public wxApp 
