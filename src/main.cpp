@@ -9,6 +9,7 @@
 #include <stdio.h>
 #include <wx/stdpaths.h>
 
+#include "croppedimgwindow.h"
 #include "loadedimage.h"
 #include "tools/bitmaptransforms.h"
 #include "tools/layoutmanager.h"
@@ -428,6 +429,8 @@ void MyFrame::OnUndo(wxCommandEvent& event)
     SetStatusText("Undoing last action...");
     // Do real undo here
     wxLogMessage("Last action undone!");
+    CroppedImgWindow *croppedImgWindow = new CroppedImgWindow(this, "Cropped Image");
+    croppedImgWindow->Show(true);
     this->DocumentModified();
     // End of undo
     SetStatusText("Last action undone!");
