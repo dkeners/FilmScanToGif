@@ -1,30 +1,48 @@
 #include "BitmapTransforms.h"
 #include "../LoadedImage.h"
 
-BitmapTransforms::BitmapTransforms() {};
+BitmapTransforms::BitmapTransforms(wxStaticBitmap *bitmap, Image *image, wxWindow *parent)
+    : staticBitmap_(bitmap), image_(image), parent_(parent) {};
 
-BitmapTransforms::BitmapTransforms(wxStaticBitmap *bitmap, Image *image)
-    : staticBitmap_(bitmap), image_(image) {};
 
-BitmapTransforms::BitmapTransforms(wxWindow *parent, wxStaticBitmap *bitmap, Image *image)
-    : staticBitmap_(bitmap), image_(image) {};
-
+bool BitmapTransforms::loadAllControls()
+{
+    return loadZoomControls() && loadMoveControls() && loadRotateControls();
+}
 
 bool BitmapTransforms::loadAllControls(wxWindow *parent, wxStaticBitmap *bitmapDisplay, Image *image)
 {
     return loadZoomControls(parent, bitmapDisplay, image) && loadMoveControls(parent, bitmapDisplay) && loadRotateControls(parent, bitmapDisplay);
 }
 
+bool BitmapTransforms::loadZoomControls()
+{
+    if (parent_ == nullptr || staticBitmap_ == nullptr || image_ == nullptr)
+    {
+        throw std::invalid_argument("Parent, static bitmap, and image must be assigned before loading zoom controls.");
+        return false;
+    }
+    return loadZoomControls(parent_, staticBitmap_, image_);
+}
+
 bool BitmapTransforms::loadZoomControls(wxWindow *parent, wxStaticBitmap *bitmapDisplay, Image *image)
 {
-    staticBitmap_ = bitmapDisplay;
-    image_ = image;
-
     button_zoom = new wxButton(parent, wxID_ANY, "+", wxDefaultPosition, wxSize(40, 40));
     button_zoom_out = new wxButton(parent, wxID_ANY, "-", wxDefaultPosition, wxSize(40, 40));
-    button_zoom->Bind(wxEVT_COMMAND_BUTTON_CLICKED, [this](wxCommandEvent& event) { zoomIn(staticBitmap_, this->image_); });
-    button_zoom_out->Bind(wxEVT_COMMAND_BUTTON_CLICKED, [this](wxCommandEvent& event) { zoomOut(staticBitmap_, this->image_); });
+    button_zoom->Bind(wxEVT_COMMAND_BUTTON_CLICKED, [this, bitmapDisplay, image](wxCommandEvent& event) { zoomIn(bitmapDisplay, image); });
+    button_zoom_out->Bind(wxEVT_COMMAND_BUTTON_CLICKED, [this, bitmapDisplay, image](wxCommandEvent& event) { zoomOut(bitmapDisplay, image); });
     return loadedZoomControls_ = true;
+}
+
+bool BitmapTransforms::loadMoveControls()
+{
+    if (parent_ == nullptr || staticBitmap_ == nullptr)
+    {
+        throw std::invalid_argument("Parent and static bitmap must be assigned before loading move controls.");
+        return false;
+    }
+    
+    return loadMoveControls(parent_, staticBitmap_);
 }
 
 bool BitmapTransforms::loadMoveControls(wxWindow *parent, wxStaticBitmap *bitmapDisplay)
@@ -33,11 +51,21 @@ bool BitmapTransforms::loadMoveControls(wxWindow *parent, wxStaticBitmap *bitmap
     button_right = new wxButton(parent, wxID_ANY, ">", wxDefaultPosition, wxSize(40, 40));
     button_up = new wxButton(parent, wxID_ANY, "^", wxDefaultPosition, wxSize(40, 40));
     button_down = new wxButton(parent, wxID_ANY, "v", wxDefaultPosition, wxSize(40, 40));
-    button_left->Bind(wxEVT_COMMAND_BUTTON_CLICKED, [this](wxCommandEvent& event) { moveLeft(staticBitmap_); });
-    button_right->Bind(wxEVT_COMMAND_BUTTON_CLICKED, [this](wxCommandEvent& event) { moveRight(staticBitmap_); });
-    button_up->Bind(wxEVT_COMMAND_BUTTON_CLICKED, [this](wxCommandEvent& event) { moveUp(staticBitmap_); });
-    button_down->Bind(wxEVT_COMMAND_BUTTON_CLICKED, [this](wxCommandEvent& event) { moveDown(staticBitmap_); });
+    button_left->Bind(wxEVT_COMMAND_BUTTON_CLICKED, [this, bitmapDisplay](wxCommandEvent& event) { moveLeft(bitmapDisplay); });
+    button_right->Bind(wxEVT_COMMAND_BUTTON_CLICKED, [this, bitmapDisplay](wxCommandEvent& event) { moveRight(bitmapDisplay); });
+    button_up->Bind(wxEVT_COMMAND_BUTTON_CLICKED, [this, bitmapDisplay](wxCommandEvent& event) { moveUp(bitmapDisplay); });
+    button_down->Bind(wxEVT_COMMAND_BUTTON_CLICKED, [this, bitmapDisplay](wxCommandEvent& event) { moveDown(bitmapDisplay); });
     return loadedMoveControls_ = true;
+}
+
+bool BitmapTransforms::loadRotateControls()
+{
+    if (parent_ == nullptr || staticBitmap_ == nullptr)
+    {
+        throw std::invalid_argument("Parent and static bitmap must be assigned before loading rotate controls.");
+        return false;
+    }
+    return loadRotateControls(parent_, staticBitmap_);
 }
 
 bool BitmapTransforms::loadRotateControls(wxWindow *parent, wxStaticBitmap *bitmapDisplay)

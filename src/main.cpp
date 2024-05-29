@@ -168,8 +168,8 @@ MyFrame::MyFrame() : wxFrame(NULL, wxID_ANY, "FilmScanMotion")
     wxLogMessage("Static Bitmaps size: %d x %d", m_static_bitmap->GetSize().GetWidth(), m_static_bitmap->GetSize().GetHeight());
 
     // BUTTON CONTROLS
-    BitmapTransforms controls_;
-    controls_.loadAllControls(this, m_static_bitmap, &image);
+    BitmapTransforms controls_(m_static_bitmap, &image, this);
+    controls_.loadAllControls();
 
     // Import Image
     wxButton *button_upload_image = new wxButton(this, wxID_ANY, "Upload Image", wxDefaultPosition, wxSize(100, 40));
