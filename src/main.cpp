@@ -46,6 +46,7 @@ private:
     void OnAbout(wxCommandEvent& event);
 
     LayoutManager layout_manager;
+    CroppedImgWindow *croppedImgWindow;
 
     wxMenuBar *menuBar;
     wxString m_filename;
@@ -182,11 +183,27 @@ MyFrame::MyFrame() : wxFrame(NULL, wxID_ANY, "FilmScanMotion")
     // END BUTTON CONTROLS
 
     // IMAGE SELECTOR CONTROLS
-
+    wxBoxSizer *sizer_image_selector = new wxBoxSizer(wxHORIZONTAL);
+    wxRadioButton *radio_button_image_choice = new wxRadioButton(this, wxID_ANY, "Image 1");
+    wxRadioButton *radio_button_image_choice2 = new wxRadioButton(this, wxID_ANY, "Image 2");
+    wxRadioButton *radio_button_image_choice3 = new wxRadioButton(this, wxID_ANY, "Image 3");
+    wxButton *button_image_choice = new wxButton(this, wxID_ANY, "Select Image", wxDefaultPosition, wxSize(100, 40));
+    button_image_choice->Bind(wxEVT_COMMAND_BUTTON_CLICKED, [this](wxCommandEvent& event) {
+        wxImage subImage = image.GetSubImage(layout_manager.frames_["1"]);
+        croppedImgWindow = new CroppedImgWindow(this, wxString("Cropped Image"), &subImage);
+        croppedImgWindow->Show(true);
+        });
+    sizer_image_selector->Add(radio_button_image_choice, 0, wxALIGN_CENTER_VERTICAL | wxTOP | wxBOTTOM, 5);
+    sizer_image_selector->Add(radio_button_image_choice2, 0, wxALIGN_CENTER_VERTICAL | wxTOP | wxBOTTOM, 5);
+    sizer_image_selector->Add(radio_button_image_choice3, 0, wxALIGN_CENTER_VERTICAL | wxTOP | wxBOTTOM, 5);
+    sizer_image_selector->AddStretchSpacer();
+    sizer_image_selector->Add(button_image_choice, 0, wxALIGN_CENTER_VERTICAL | wxTOP | wxBOTTOM, 5);
+    // END IMAGE SELECTOR CONTROLS
 
     wxBoxSizer *sizer = new wxBoxSizer(wxVERTICAL);
     sizer->Add(panel_image, 0, wxEXPAND | wxALL, 10);
     sizer->Add(sizer_image_controls, 0, wxEXPAND | wxLEFT | wxRIGHT | wxBOTTOM, 10);
+    sizer->Add(sizer_image_selector, 0, wxEXPAND | wxLEFT | wxRIGHT | wxBOTTOM, 10);
 
     this->SetSizerAndFit(sizer);
 }
@@ -403,8 +420,8 @@ void MyFrame::OnUndo(wxCommandEvent& event)
     SetStatusText("Undoing last action...");
     // Do real undo here
     wxLogMessage("Last action undone!");
-    CroppedImgWindow *croppedImgWindow = new CroppedImgWindow(this, "Cropped Image");
-    croppedImgWindow->Show(true);
+    // CroppedImgWindow *croppedImgWindow = new CroppedImgWindow(this, "Cropped Image");
+    // croppedImgWindow->Show(true);
     this->DocumentModified();
     // End of undo
     SetStatusText("Last action undone!");
