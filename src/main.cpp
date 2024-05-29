@@ -168,41 +168,15 @@ MyFrame::MyFrame() : wxFrame(NULL, wxID_ANY, "FilmScanMotion")
     wxLogMessage("Static Bitmaps size: %d x %d", m_static_bitmap->GetSize().GetWidth(), m_static_bitmap->GetSize().GetHeight());
 
     // BUTTON CONTROLS
-    wxButton *button_zoom = new wxButton(this, wxID_ANY, "+", wxDefaultPosition, wxSize(40, 40));
-    wxButton *button_zoom_out = new wxButton(this, wxID_ANY, "-", wxDefaultPosition, wxSize(40, 40));
-    button_zoom->Bind(wxEVT_COMMAND_BUTTON_CLICKED, [this](wxCommandEvent& event) { BitmapTransforms::zoomIn(m_static_bitmap, &image); });
-    button_zoom_out->Bind(wxEVT_COMMAND_BUTTON_CLICKED, [this](wxCommandEvent& event) { BitmapTransforms::zoomOut(m_static_bitmap, &image); });
-
-    wxButton *button_left = new wxButton(this, wxID_ANY, "<", wxDefaultPosition, wxSize(40, 40));
-    wxButton *button_right = new wxButton(this, wxID_ANY, ">", wxDefaultPosition, wxSize(40, 40));
-    wxButton *button_up = new wxButton(this, wxID_ANY, "^", wxDefaultPosition, wxSize(40, 40));
-    wxButton *button_down = new wxButton(this, wxID_ANY, "v", wxDefaultPosition, wxSize(40, 40));
-    button_left->Bind(wxEVT_COMMAND_BUTTON_CLICKED, [this](wxCommandEvent& event) { BitmapTransforms::moveLeft(m_static_bitmap); });
-    button_right->Bind(wxEVT_COMMAND_BUTTON_CLICKED, [this](wxCommandEvent& event) { BitmapTransforms::moveRight(m_static_bitmap); });
-    button_up->Bind(wxEVT_COMMAND_BUTTON_CLICKED, [this](wxCommandEvent& event) { BitmapTransforms::moveUp(m_static_bitmap); });
-    button_down->Bind(wxEVT_COMMAND_BUTTON_CLICKED, [this](wxCommandEvent& event) { BitmapTransforms::moveDown(m_static_bitmap); });
-
-    wxButton *button_rotate_left = new wxButton(this, wxID_ANY, "↺", wxDefaultPosition, wxSize(40, 40));
-    wxButton *button_rotate_right = new wxButton(this, wxID_ANY, "↻", wxDefaultPosition, wxSize(40, 40));
+    BitmapTransforms controls_;
+    controls_.loadAllControls(this, m_static_bitmap, &image);
 
     // Import Image
     wxButton *button_upload_image = new wxButton(this, wxID_ANY, "Upload Image", wxDefaultPosition, wxSize(100, 40));
     button_upload_image->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &MyFrame::OnImport, this);
 
     // Button Controls Sizer
-    wxBoxSizer *sizer_image_controls = new wxBoxSizer(wxHORIZONTAL);
-    sizer_image_controls->Add(button_zoom, 0, wxALIGN_CENTER_VERTICAL | wxRIGHT | wxTOP | wxBOTTOM, 5);
-    sizer_image_controls->Add(button_zoom_out, 0, wxALIGN_CENTER_VERTICAL | wxRIGHT | wxTOP | wxBOTTOM, 5);
-
-    sizer_image_controls->Add(button_left, 0, wxALIGN_CENTER_VERTICAL | wxRIGHT | wxTOP | wxBOTTOM, 5);
-    sizer_image_controls->Add(button_right, 0, wxALIGN_CENTER_VERTICAL | wxRIGHT | wxTOP | wxBOTTOM, 5);
-    sizer_image_controls->Add(button_up, 0, wxALIGN_CENTER_VERTICAL | wxRIGHT | wxTOP | wxBOTTOM, 5);
-    sizer_image_controls->Add(button_down, 0, wxALIGN_CENTER_VERTICAL | wxRIGHT | wxTOP | wxBOTTOM, 5);
-
-    sizer_image_controls->Add(button_rotate_left, 0, wxALIGN_CENTER_VERTICAL | wxRIGHT | wxTOP | wxBOTTOM, 5);
-    sizer_image_controls->Add(button_rotate_right, 0, wxALIGN_CENTER_VERTICAL | wxRIGHT | wxTOP | wxBOTTOM, 5);
-
-    sizer_image_controls->AddStretchSpacer();
+    wxBoxSizer *sizer_image_controls = controls_.createControlSizer();
 
     sizer_image_controls->Add(button_upload_image, 0, wxALIGN_CENTER_VERTICAL | wxTOP | wxBOTTOM, 5);
     // END BUTTON CONTROLS
