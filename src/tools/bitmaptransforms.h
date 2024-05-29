@@ -34,4 +34,8 @@ public:
 private:
     wxStaticBitmap *staticBitmap_;
     Image *image_;
+
+    bool loadedZoomControls_ = false;
+    bool loadedMoveControls_ = false;
+    bool loadedRotateControls_ = false;
 };

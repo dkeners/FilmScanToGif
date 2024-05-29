@@ -24,7 +24,7 @@ bool BitmapTransforms::loadZoomControls(wxWindow *parent, wxStaticBitmap *bitmap
     button_zoom_out = new wxButton(parent, wxID_ANY, "-", wxDefaultPosition, wxSize(40, 40));
     button_zoom->Bind(wxEVT_COMMAND_BUTTON_CLICKED, [this](wxCommandEvent& event) { zoomIn(staticBitmap_, this->image_); });
     button_zoom_out->Bind(wxEVT_COMMAND_BUTTON_CLICKED, [this](wxCommandEvent& event) { zoomOut(staticBitmap_, this->image_); });
-    return true;
+    return loadedZoomControls_ = true;
 }
 
 bool BitmapTransforms::loadMoveControls(wxWindow *parent, wxStaticBitmap *bitmapDisplay)
@@ -37,30 +37,36 @@ bool BitmapTransforms::loadMoveControls(wxWindow *parent, wxStaticBitmap *bitmap
     button_right->Bind(wxEVT_COMMAND_BUTTON_CLICKED, [this](wxCommandEvent& event) { moveRight(staticBitmap_); });
     button_up->Bind(wxEVT_COMMAND_BUTTON_CLICKED, [this](wxCommandEvent& event) { moveUp(staticBitmap_); });
     button_down->Bind(wxEVT_COMMAND_BUTTON_CLICKED, [this](wxCommandEvent& event) { moveDown(staticBitmap_); });
-    return true;
+    return loadedMoveControls_ = true;
 }
 
 bool BitmapTransforms::loadRotateControls(wxWindow *parent, wxStaticBitmap *bitmapDisplay)
 {
     button_rotate_left = new wxButton(parent, wxID_ANY, "↺", wxDefaultPosition, wxSize(40, 40));
     button_rotate_right = new wxButton(parent, wxID_ANY, "↻", wxDefaultPosition, wxSize(40, 40));
-    return true;
+    return loadedRotateControls_ = true;
 }
 
 wxBoxSizer *BitmapTransforms::createControlSizer(int padding)
 {
     wxBoxSizer *sizer = new wxBoxSizer(wxHORIZONTAL);
-    sizer->Add(button_zoom, 0, wxALIGN_CENTER_VERTICAL | wxRIGHT | wxTOP | wxBOTTOM, padding);
-    sizer->Add(button_zoom_out, 0, wxALIGN_CENTER_VERTICAL | wxRIGHT | wxTOP | wxBOTTOM, padding);
-
-    sizer->Add(button_left, 0, wxALIGN_CENTER_VERTICAL | wxRIGHT | wxTOP | wxBOTTOM, padding);
-    sizer->Add(button_right, 0, wxALIGN_CENTER_VERTICAL | wxRIGHT | wxTOP | wxBOTTOM, padding);
-    sizer->Add(button_up, 0, wxALIGN_CENTER_VERTICAL | wxRIGHT | wxTOP | wxBOTTOM, padding);
-    sizer->Add(button_down, 0, wxALIGN_CENTER_VERTICAL | wxRIGHT | wxTOP | wxBOTTOM, padding);
-
-    sizer->Add(button_rotate_left, 0, wxALIGN_CENTER_VERTICAL | wxRIGHT | wxTOP | wxBOTTOM, padding);
-    sizer->Add(button_rotate_right, 0, wxALIGN_CENTER_VERTICAL | wxRIGHT | wxTOP | wxBOTTOM, padding);
-
+    if (loadedZoomControls_)
+    {
+        sizer->Add(button_zoom, 0, wxALIGN_CENTER_VERTICAL | wxRIGHT | wxTOP | wxBOTTOM, padding);
+        sizer->Add(button_zoom_out, 0, wxALIGN_CENTER_VERTICAL | wxRIGHT | wxTOP | wxBOTTOM, padding);
+    }
+    if (loadedMoveControls_)
+    {
+        sizer->Add(button_left, 0, wxALIGN_CENTER_VERTICAL | wxRIGHT | wxTOP | wxBOTTOM, padding);
+        sizer->Add(button_right, 0, wxALIGN_CENTER_VERTICAL | wxRIGHT | wxTOP | wxBOTTOM, padding);
+        sizer->Add(button_up, 0, wxALIGN_CENTER_VERTICAL | wxRIGHT | wxTOP | wxBOTTOM, padding);
+        sizer->Add(button_down, 0, wxALIGN_CENTER_VERTICAL | wxRIGHT | wxTOP | wxBOTTOM, padding);
+    }
+    if (loadedRotateControls_)
+    {
+        sizer->Add(button_rotate_left, 0, wxALIGN_CENTER_VERTICAL | wxRIGHT | wxTOP | wxBOTTOM, padding);
+        sizer->Add(button_rotate_right, 0, wxALIGN_CENTER_VERTICAL | wxRIGHT | wxTOP | wxBOTTOM, padding);
+    }
     sizer->AddStretchSpacer();
     return sizer;
 }
