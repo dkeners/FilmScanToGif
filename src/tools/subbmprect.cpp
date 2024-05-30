@@ -18,4 +18,5 @@ bool SubBmpRect::scaleFrame(double scale)
     double y2 = point2.y * scale;
     this->SetTopLeft(wxPoint(x1, y1));
     this->SetBottomRight(wxPoint(x2, y2));
+    return true;
 }
