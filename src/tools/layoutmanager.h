@@ -15,12 +15,14 @@ private:
     const wxString layoutsPath_     = wxStandardPaths::Get().GetResourcesDir() + "\\settings\\";
 
     int currentLayoutIndex_;
-    std::map<wxString, SubBmpRect> frames_;
+    
 public:
     wxString defaultLayout_;
     wxArrayString layouts_;
     wxArrayString layoutsFileArray_;
     wxArrayString layoutsImgArray_;
+
+    std::map<wxString, SubBmpRect> frames_;
 
     LayoutManager();
     bool loadLayout(wxString layoutName = "default");
