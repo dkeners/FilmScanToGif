@@ -138,6 +138,12 @@ void Image::setScale(double scale) {
 // Public methods
 void Image::ScaleImage(wxStaticBitmap *bitmapDisplay)
 {
+    if (!this->IsOk())
+    {
+        wxMessageBox("Image is not loaded properly.", "Error", wxICON_ERROR);
+        return;
+    }
+
     m_scaledSize = m_fullSize * m_scale;
 
     m_position = wxPoint((m_panelSize.x - m_scaledSize.x) / 2, (m_panelSize.y - m_scaledSize.y) / 2);
