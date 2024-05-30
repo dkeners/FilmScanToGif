@@ -140,6 +140,12 @@ MyFrame::MyFrame() : wxFrame(NULL, wxID_ANY, "FilmScanMotion")
 
     SetStatusText("Welcome to FilmScanMotion!");
     // END INIT APP STATUS BAR
+
+    if (layout_manager.loadLayout()) {
+        SetStatusText("Welcome to FilmScanMotion! Loaded default layout: " + layout_manager.defaultLayout_);
+    } else {
+        wxLogError("Failed to load default layout!");
+    }
     
     wxPanel *panel_image = new wxPanel(this, wxID_ANY, wxDefaultPosition, m_imagepanel_size, wxBORDER_NONE, "Panel");
     panel_image->AlwaysShowScrollbars(true, true);
@@ -432,12 +438,6 @@ void MyFrame::OnRedo(wxCommandEvent& event)
     SetStatusText("Redoing last action...");
     // Do real redo here
     wxLogMessage("Last action redone!");
-    if (layout_manager.loadLayout("Nimslo 3D")) {
-        wxLogMessage("Loaded set layout: %s", layout_manager.defaultLayout_);
-    }
-    if (layout_manager.loadLayout()) {
-        wxLogMessage("Loaded default layout: %s", layout_manager.defaultLayout_);
-    }
     this->DocumentModified();
     // End of redo
     SetStatusText("Last action redone!");
