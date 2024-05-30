@@ -5,7 +5,7 @@
 class CroppedImgWindow : public wxFrame
 {
 public:
-    CroppedImgWindow(wxFrame *parent, wxString title);
+    CroppedImgWindow(wxFrame *parent, wxString title, wxImage *image);
     // ~CroppedImgWindow();
 private:
     void OnComplete(wxCommandEvent& event);

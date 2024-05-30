@@ -2,7 +2,7 @@
 
 #include "tools/bitmaptransforms.h"
 
-CroppedImgWindow::CroppedImgWindow(wxFrame *parent, wxString title)
+CroppedImgWindow::CroppedImgWindow(wxFrame *parent, wxString title, wxImage *image)
     : wxFrame(parent, wxID_ANY, title)
 {
     SetSize(600, 800);
@@ -14,8 +14,8 @@ CroppedImgWindow::CroppedImgWindow(wxFrame *parent, wxString title)
     wxStaticText *st = new wxStaticText(this, wxID_ANY, wxT("Cropped Image"));
     hbox->Add(st, 0, wxRIGHT, 8);
 
-    wxBitmap bitmap(wxT("D:\\Nextcloud\\Documents\\Code\\wxWidgetsTests\\src\\settings\\Nimslo3DLayout.png"), wxBITMAP_TYPE_PNG);
-    wxStaticBitmap *sb = new wxStaticBitmap(this, wxID_ANY, bitmap);
+    // wxBitmap bitmap(wxT("D:\\Nextcloud\\Documents\\Code\\wxWidgetsTests\\src\\settings\\Nimslo3DLayout.png"), wxBITMAP_TYPE_PNG);
+    wxStaticBitmap *sb = new wxStaticBitmap(this, wxID_ANY, *image);
     hbox->Add(sb, 1);
     vbox->Add(hbox, 0, wxALL, 10);
 
@@ -27,11 +27,11 @@ CroppedImgWindow::CroppedImgWindow(wxFrame *parent, wxString title)
     m_timer.Start(150);  // Start the timer to fire every 100ms
     
     // BUTTON CONTROLS
-    BitmapTransforms controls_;
-    controls_.loadMoveControls(this, sb);
+    BitmapTransforms controls_(sb, nullptr, this);
+    controls_.loadMoveControls();
 
-    // Import Image
-    wxButton *button_upload_image = new wxButton(this, wxID_ANY, "Upload Image", wxDefaultPosition, wxSize(100, 40));
+    // Export Image
+    wxButton *button_upload_image = new wxButton(this, wxID_ANY, "Export Image", wxDefaultPosition, wxSize(100, 40));
     button_upload_image->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &CroppedImgWindow::OnComplete, this);
 
     // Button Controls Sizer
