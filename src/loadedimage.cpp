@@ -8,7 +8,7 @@
 // Constructors
 Image::Image() : wxImage() {
     m_filename = "";
-    m_position = wxPoint(0, 0);
+    position_ = wxPoint(0, 0);
     m_panelSize = wxSize(0, 0);
     m_fullSize = wxSize(0, 0);
     m_scaledSize = wxSize(0, 0);
@@ -16,7 +16,7 @@ Image::Image() : wxImage() {
 }
 
 Image::Image(const wxString &filename, wxPoint position, wxSize imageSize, wxSize scaledSize, double scale)
-    : m_filename(filename), m_position(position), m_fullSize(imageSize), m_scaledSize(scaledSize), m_scale(scale) {
+    : m_filename(filename), position_(position), m_fullSize(imageSize), m_scaledSize(scaledSize), m_scale(scale) {
     // Load the image from the file
     LoadFile(filename);
 }
@@ -27,15 +27,15 @@ wxString Image::getFilename() const {
 }
 
 wxPoint Image::getPosition() const {
-    return m_position;
+    return position_;
 }
 
 int Image::getPositionX() const {
-    return m_position.x;
+    return position_.x;
 }
 
 int Image::getPositionY() const {
-    return m_position.y;
+    return position_.y;
 }
 
 wxSize Image::getPanelSize() const {
@@ -84,11 +84,11 @@ void Image::setFilename(const wxString &filename) {
 }
 
 void Image::setPosition(const wxPoint &position) {
-    m_position = position;
+    position_ = position;
 }
 
 void Image::setPosition(int x, int y) {
-    m_position = wxPoint(x, y);
+    position_ = wxPoint(x, y);
 }
 
 void Image::setPanelSize(const wxSize &size) {
@@ -146,14 +146,14 @@ void Image::ScaleImage(wxStaticBitmap *bitmapDisplay)
 
     m_scaledSize = m_fullSize * m_scale;
 
-    m_position = wxPoint((m_panelSize.x - m_scaledSize.x) / 2, (m_panelSize.y - m_scaledSize.y) / 2);
+    position_ = wxPoint((m_panelSize.x - m_scaledSize.x) / 2, (m_panelSize.y - m_scaledSize.y) / 2);
     
     wxImage scaledImage = (*this).Copy();
     scaledImage.Rescale(m_scaledSize.GetWidth(), m_scaledSize.GetHeight(), wxIMAGE_QUALITY_HIGH);
 
     bitmapDisplay->SetBitmap(scaledImage);
     bitmapDisplay->SetSize(m_scaledSize);
-    bitmapDisplay->SetPosition(m_position);
+    bitmapDisplay->SetPosition(position_);
 }
 
 void Image::LoadAndScaleImage(wxString filename, wxStaticBitmap *bitmapDisplay)
@@ -190,4 +190,130 @@ void Image::LoadAndScaleImage(wxString filename, wxStaticBitmap *bitmapDisplay)
     }
 
     ScaleImage(bitmapDisplay);
+}
+
+wxImage Image::CustomSubImage(SubBmpRect rect)
+{
+    if (!this->IsOk())
+    {
+        wxMessageBox("Image is not loaded properly.", "Error", wxICON_ERROR);
+        return wxImage();
+    } else {
+        wxMessageBox("Rect is not empty. Details: " + wxString::Format("x: %d, y: %d, width: %d, height: %d", rect.x, rect.y, rect.width, rect.height), "Info", wxICON_INFORMATION);
+        rect.Offset(-position_.x, -position_.y);
+        wxMessageBox("Rect has been offset. Details: " + wxString::Format("x: %d, y: %d, width: %d, height: %d", rect.x, rect.y, rect.width, rect.height), "Info", wxICON_INFORMATION);
+        rect.scaleFrame((double)(1 / m_scale));
+        wxMessageBox("Rect has been scaled. Details: " + wxString::Format("x: %d, y: %d, width: %d, height: %d", rect.x, rect.y, rect.width, rect.height), "Info", wxICON_INFORMATION);
+    }
+    
+    // This following bit may be bad but i don't know how to get Image type returned otherwise than writing 
+    // (new Image())->SetData((*this).GetSubImage(rect).GetData());
+    // Ok new plan, I will just copy the code from the wxImage::GetSubImage method and modify it to return Image type, plus feature cropping the rect smaller if it goes out of bounds.
+    Image image;
+
+    wxCHECK_MSG( IsOk(), image, wxT("invalid image") );
+
+    wxCHECK_MSG( (rect.GetLeft()>=0) && (rect.GetTop()>=0) &&
+                 (rect.GetRight()<=GetWidth()) && (rect.GetBottom()<=GetHeight()),
+                 image, wxT("invalid subimage size") );
+
+    int left = rect.GetLeft();
+    int top = rect.GetTop();
+    int right = rect.GetRight();
+    int bottom = rect.GetBottom();
+
+    if (left < 0)
+    {
+        left = 0;
+    }
+    if (top < 0)
+    {
+        top = 0;
+    }
+    if (right > GetWidth())
+    {
+        right = GetWidth();
+    }
+    if (bottom > GetHeight())
+    {
+        bottom = GetHeight();
+    }
+
+    const int subwidth = rect.GetWidth();
+    const int subheight = rect.GetHeight();
+
+    image.Create( subwidth, subheight, false );
+
+    const unsigned char *src_data = GetData();
+    const unsigned char *src_alpha = M_IMGDATA->m_alpha;
+    unsigned char *subdata = image.GetData();
+    unsigned char *subalpha = NULL;
+
+    wxCHECK_MSG( subdata, image, wxT("unable to create image") );
+
+    if ( src_alpha ) {
+        image.SetAlpha();
+        subalpha = image.GetAlpha();
+        wxCHECK_MSG( subalpha, image, wxT("unable to create alpha channel"));
+    }
+
+    if (M_IMGDATA->m_hasMask)
+        image.SetMaskColour( M_IMGDATA->m_maskRed, M_IMGDATA->m_maskGreen, M_IMGDATA->m_maskBlue );
+
+    const int width = GetWidth();
+    const int pixsoff = rect.GetLeft() + width * rect.GetTop();
+
+    src_data += 3 * pixsoff;
+    src_alpha += pixsoff; // won't be used if was NULL, so this is ok
+
+    for (long j = 0; j < subheight; ++j)
+    {
+        memcpy( subdata, src_data, 3 * subwidth );
+        subdata += 3 * subwidth;
+        src_data += 3 * width;
+        if (subalpha != NULL) {
+            memcpy( subalpha, src_alpha, subwidth );
+            subalpha += subwidth;
+            src_alpha += width;
+        }
+    }
+
+    return image;
+    // return (*this).GetSubImage(rect);
+}
+
+void Image::zoomIn(wxStaticBitmap *bitmapDisplay)
+{
+    this->m_scale *= 1.1;
+    this->ScaleImage(bitmapDisplay);
+}
+
+void Image::zoomOut(wxStaticBitmap *bitmapDisplay)
+{
+    this->m_scale *= 0.9;
+    this->ScaleImage(bitmapDisplay);
+}
+
+void Image::moveLeft(wxStaticBitmap *bitmapDisplay, int step)
+{
+    position_.x -= step;
+    bitmapDisplay->SetPosition(position_);
+}
+
+void Image::moveRight(wxStaticBitmap *bitmapDisplay, int step)
+{
+    position_.x += step;
+    bitmapDisplay->SetPosition(position_);
+}
+
+void Image::moveUp(wxStaticBitmap *bitmapDisplay, int step)
+{
+    position_.y -= step;
+    bitmapDisplay->SetPosition(position_);
+}
+
+void Image::moveDown(wxStaticBitmap *bitmapDisplay, int step)
+{
+    position_.y += step;
+    bitmapDisplay->SetPosition(position_);
 }

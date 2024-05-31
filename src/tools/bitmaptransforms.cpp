@@ -12,14 +12,14 @@ bool BitmapTransforms::loadAllControls()
 
 bool BitmapTransforms::loadAllControls(wxWindow *parent, wxStaticBitmap *bitmapDisplay, Image *image)
 {
-    return loadZoomControls(parent, bitmapDisplay, image) && loadMoveControls(parent, bitmapDisplay) && loadRotateControls(parent, bitmapDisplay);
+    return loadZoomControls(parent, bitmapDisplay, image) && loadMoveControls(parent, bitmapDisplay, image) && loadRotateControls(parent, bitmapDisplay);
 }
 
 bool BitmapTransforms::loadZoomControls()
 {
     if (parent_ == nullptr || staticBitmap_ == nullptr || image_ == nullptr)
     {
-        throw std::invalid_argument("Parent, static bitmap, and image must be assigned before loading zoom controls.");
+        wxLogError("Parent, static bitmap, and image must be assigned before loading zoom controls.");
         return false;
     }
     return loadZoomControls(parent_, staticBitmap_, image_);
@@ -29,8 +29,8 @@ bool BitmapTransforms::loadZoomControls(wxWindow *parent, wxStaticBitmap *bitmap
 {
     button_zoom = new wxButton(parent, wxID_ANY, "+", wxDefaultPosition, wxSize(40, 40));
     button_zoom_out = new wxButton(parent, wxID_ANY, "-", wxDefaultPosition, wxSize(40, 40));
-    button_zoom->Bind(wxEVT_COMMAND_BUTTON_CLICKED, [this, bitmapDisplay, image](wxCommandEvent& event) { zoomIn(bitmapDisplay, image); });
-    button_zoom_out->Bind(wxEVT_COMMAND_BUTTON_CLICKED, [this, bitmapDisplay, image](wxCommandEvent& event) { zoomOut(bitmapDisplay, image); });
+    button_zoom->Bind(wxEVT_COMMAND_BUTTON_CLICKED, [this, bitmapDisplay, image](wxCommandEvent& event) { image->zoomIn(bitmapDisplay); });
+    button_zoom_out->Bind(wxEVT_COMMAND_BUTTON_CLICKED, [this, bitmapDisplay, image](wxCommandEvent& event) { image->zoomOut(bitmapDisplay); });
     return loadedZoomControls_ = true;
 }
 
@@ -42,19 +42,19 @@ bool BitmapTransforms::loadMoveControls()
         return false;
     }
     
-    return loadMoveControls(parent_, staticBitmap_);
+    return loadMoveControls(parent_, staticBitmap_, image_);
 }
 
-bool BitmapTransforms::loadMoveControls(wxWindow *parent, wxStaticBitmap *bitmapDisplay)
+bool BitmapTransforms::loadMoveControls(wxWindow *parent, wxStaticBitmap *bitmapDisplay, Image *image)
 {
     button_left = new wxButton(parent, wxID_ANY, "<", wxDefaultPosition, wxSize(40, 40));
     button_right = new wxButton(parent, wxID_ANY, ">", wxDefaultPosition, wxSize(40, 40));
     button_up = new wxButton(parent, wxID_ANY, "^", wxDefaultPosition, wxSize(40, 40));
     button_down = new wxButton(parent, wxID_ANY, "v", wxDefaultPosition, wxSize(40, 40));
-    button_left->Bind(wxEVT_COMMAND_BUTTON_CLICKED, [this, bitmapDisplay](wxCommandEvent& event) { moveLeft(bitmapDisplay); });
-    button_right->Bind(wxEVT_COMMAND_BUTTON_CLICKED, [this, bitmapDisplay](wxCommandEvent& event) { moveRight(bitmapDisplay); });
-    button_up->Bind(wxEVT_COMMAND_BUTTON_CLICKED, [this, bitmapDisplay](wxCommandEvent& event) { moveUp(bitmapDisplay); });
-    button_down->Bind(wxEVT_COMMAND_BUTTON_CLICKED, [this, bitmapDisplay](wxCommandEvent& event) { moveDown(bitmapDisplay); });
+    button_left->Bind(wxEVT_COMMAND_BUTTON_CLICKED, [this, bitmapDisplay, image](wxCommandEvent& event) { image->moveLeft(bitmapDisplay); });
+    button_right->Bind(wxEVT_COMMAND_BUTTON_CLICKED, [this, bitmapDisplay, image](wxCommandEvent& event) { image->moveRight(bitmapDisplay); });
+    button_up->Bind(wxEVT_COMMAND_BUTTON_CLICKED, [this, bitmapDisplay, image](wxCommandEvent& event) { image->moveUp(bitmapDisplay); });
+    button_down->Bind(wxEVT_COMMAND_BUTTON_CLICKED, [this, bitmapDisplay, image](wxCommandEvent& event) { image->moveDown(bitmapDisplay); });
     return loadedMoveControls_ = true;
 }
 
@@ -97,44 +97,4 @@ wxBoxSizer *BitmapTransforms::createControlSizer(int padding)
     }
     sizer->AddStretchSpacer();
     return sizer;
-}
-
-void BitmapTransforms::zoomIn(wxStaticBitmap *bitmapDisplay, Image *image)
-{
-    image->m_scale *= 1.1;
-    image->ScaleImage(bitmapDisplay);
-}
-
-void BitmapTransforms::zoomOut(wxStaticBitmap *bitmapDisplay, Image *image)
-{
-    image->m_scale *= 0.9;
-    image->ScaleImage(bitmapDisplay);
-}
-
-void BitmapTransforms::moveLeft(wxStaticBitmap *bitmapDisplay)
-{
-    wxPoint position = bitmapDisplay->GetPosition();
-    position.x -= 10;
-    bitmapDisplay->SetPosition(position);
-}
-
-void BitmapTransforms::moveRight(wxStaticBitmap *bitmapDisplay)
-{
-    wxPoint position = bitmapDisplay->GetPosition();
-    position.x += 10;
-    bitmapDisplay->SetPosition(position);
-}
-
-void BitmapTransforms::moveUp(wxStaticBitmap *bitmapDisplay)
-{
-    wxPoint position = bitmapDisplay->GetPosition();
-    position.y -= 10;
-    bitmapDisplay->SetPosition(position);
-}
-
-void BitmapTransforms::moveDown(wxStaticBitmap *bitmapDisplay)
-{
-    wxPoint position = bitmapDisplay->GetPosition();
-    position.y += 10;
-    bitmapDisplay->SetPosition(position);
 }

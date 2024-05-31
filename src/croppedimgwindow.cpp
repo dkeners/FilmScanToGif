@@ -27,7 +27,7 @@ CroppedImgWindow::CroppedImgWindow(wxFrame *parent, wxString title, wxImage *ima
     m_timer.Start(150);  // Start the timer to fire every 100ms
     
     // BUTTON CONTROLS
-    BitmapTransforms controls_(sb, nullptr, this);
+    BitmapTransforms controls_(sb, image, this);
     controls_.loadMoveControls();
 
     // Export Image

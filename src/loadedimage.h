@@ -4,6 +4,8 @@
 #include <wx/image.h>
 // #include <wx/univ/statbmp.h>
 
+#include "tools/subbmprect.h"
+
 /**
  * @class Image
  * @brief Represents an image object.
@@ -106,9 +108,56 @@ public:
      */
     void LoadAndScaleImage(wxString filename, wxStaticBitmap *bitmapDisplay);
 
+    wxImage CustomSubImage(SubBmpRect rect);
+
+    
+    /**
+     * @brief Zooms in the bitmap.
+     * 
+     * @param bitmapDisplay The static bitmap to zoom.
+     * @param image The image object containing the bitmap.
+     */
+    void zoomIn(wxStaticBitmap *bitmapDisplay);
+
+    /**
+     * @brief Zooms out the bitmap.
+     * 
+     * @param bitmapDisplay The static bitmap to zoom.
+     * @param image The image object containing the bitmap.
+     */
+    void zoomOut(wxStaticBitmap *bitmapDisplay);
+
+    /**
+     * @brief Moves the bitmap to the left.
+     * 
+     * @param bitmapDisplay The static bitmap to move.
+     */
+    void moveLeft(wxStaticBitmap *bitmapDisplay, int step = 10);
+
+    /**
+     * @brief Moves the bitmap to the right.
+     * 
+     * @param bitmapDisplay The static bitmap to move.
+     */
+    void moveRight(wxStaticBitmap *bitmapDisplay, int step = 10);
+
+    /**
+     * @brief Moves the bitmap up.
+     * 
+     * @param bitmapDisplay The static bitmap to move.
+     */
+    void moveUp(wxStaticBitmap *bitmapDisplay, int step = 10);
+
+    /**
+     * @brief Moves the bitmap down.
+     * 
+     * @param bitmapDisplay The static bitmap to move.
+     */
+    void moveDown(wxStaticBitmap *bitmapDisplay, int step = 10);
+
 private:
     wxString m_filename;
-    wxPoint m_position;
+    wxPoint position_;
     wxSize m_panelSize;
     wxSize m_fullSize;
     wxSize m_scaledSize;

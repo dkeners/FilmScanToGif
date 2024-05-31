@@ -6,9 +6,7 @@
 /**
  * @brief The BitmapTransforms class provides a set of functions for transforming bitmaps.
  *
- * This class encapsulates various bitmap transformation operations, such as scaling, rotating,
- * flipping, and cropping. It provides a convenient interface for applying these transformations
- * to wxWidgets bitmaps.
+ * This whole class is a bit of a shitshow. I really need to refactor it. It's a bunch of functions that are all related to transforming bitmaps in some way. It's a bit of a mess.
  */
 class BitmapTransforms
 {
@@ -70,7 +68,7 @@ public:
      * @param bitmapDisplay The static bitmap to control.
      * @return True if move controls were successfully loaded and the bitmap was displayed, false otherwise.
      */
-    bool loadMoveControls(wxWindow *parent, wxStaticBitmap *bitmapDisplay);
+    bool loadMoveControls(wxWindow *parent, wxStaticBitmap *bitmapDisplay, Image *image);
 
     /**
      * @brief Loads rotate controls.
@@ -95,50 +93,6 @@ public:
      * @return The created wxBoxSizer object.
      */
     wxBoxSizer *createControlSizer(int padding = 5);
-
-    /**
-     * @brief Zooms in the bitmap.
-     * 
-     * @param bitmapDisplay The static bitmap to zoom.
-     * @param image The image object containing the bitmap.
-     */
-    void zoomIn(wxStaticBitmap *bitmapDisplay, Image *image);
-
-    /**
-     * @brief Zooms out the bitmap.
-     * 
-     * @param bitmapDisplay The static bitmap to zoom.
-     * @param image The image object containing the bitmap.
-     */
-    void zoomOut(wxStaticBitmap *bitmapDisplay, Image *image);
-
-    /**
-     * @brief Moves the bitmap to the left.
-     * 
-     * @param bitmapDisplay The static bitmap to move.
-     */
-    void moveLeft(wxStaticBitmap *bitmapDisplay);
-
-    /**
-     * @brief Moves the bitmap to the right.
-     * 
-     * @param bitmapDisplay The static bitmap to move.
-     */
-    void moveRight(wxStaticBitmap *bitmapDisplay);
-
-    /**
-     * @brief Moves the bitmap up.
-     * 
-     * @param bitmapDisplay The static bitmap to move.
-     */
-    void moveUp(wxStaticBitmap *bitmapDisplay);
-
-    /**
-     * @brief Moves the bitmap down.
-     * 
-     * @param bitmapDisplay The static bitmap to move.
-     */
-    void moveDown(wxStaticBitmap *bitmapDisplay);
 
 private:
     wxWindow *parent_; // The parent window
