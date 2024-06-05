@@ -2,22 +2,22 @@
 
 #include "tools/bitmaptransforms.h"
 
-CroppedImgWindow::CroppedImgWindow(wxFrame *parent, wxString title, wxImage *image)
+CroppedImgWindow::CroppedImgWindow(wxFrame *parent, wxString title, Image *image)
     : wxFrame(parent, wxID_ANY, title)
 {
     SetSize(600, 800);
 
-    wxPanel *panel = new wxPanel(this, wxID_ANY);
     wxBoxSizer *vbox = new wxBoxSizer(wxVERTICAL);
-    wxBoxSizer *hbox = new wxBoxSizer(wxHORIZONTAL);
-
-    wxStaticText *st = new wxStaticText(this, wxID_ANY, wxT("Cropped Image"));
-    hbox->Add(st, 0, wxRIGHT, 8);
 
     // wxBitmap bitmap(wxT("D:\\Nextcloud\\Documents\\Code\\wxWidgetsTests\\src\\settings\\Nimslo3DLayout.png"), wxBITMAP_TYPE_PNG);
     wxStaticBitmap *sb = new wxStaticBitmap(this, wxID_ANY, *image);
-    hbox->Add(sb, 1);
-    vbox->Add(hbox, 0, wxALL, 10);
+    sb->SetSize(wxSize(600, 600));
+        // wxMessageBox("Using scale mode: " + std::to_string(sb->GetScaleMode()));
+    // sb->SetScaleMode(wxStaticBitmap::Scale_AspectFit);
+    // wxMessageBox("Using scale mode: " + std::to_string(sb->GetScaleMode()));
+    image->setPanelSize(600, 600);
+    image->FitImage(sb);
+    vbox->Add(sb, 0, wxALL, 10);
 
     // ascii loading spinner
     m_loading = new wxStaticText(this, wxID_ANY, wxT("Loading..."));

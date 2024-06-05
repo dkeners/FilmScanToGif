@@ -15,7 +15,7 @@
 class Image : public wxImage {
 public:
     // Public member variables
-    double m_scale;
+    double m_scale = 1.0;
 
     // Constructors
     Image();
@@ -100,6 +100,8 @@ public:
      */
     void ScaleImage(wxStaticBitmap *bitmapDisplay);
 
+    void FitImage(wxStaticBitmap *bitmapDisplay);
+
     /**
      * Loads and scales an image file to fit within the specified wxStaticBitmap control.
      * 
@@ -108,7 +110,7 @@ public:
      */
     void LoadAndScaleImage(wxString filename, wxStaticBitmap *bitmapDisplay);
 
-    wxImage CustomSubImage(SubBmpRect rect);
+    Image CustomSubImage(SubBmpRect rect);
 
     
     /**
@@ -156,10 +158,10 @@ public:
     void moveDown(wxStaticBitmap *bitmapDisplay, int step = 10);
 
 private:
-    wxString m_filename;
-    wxPoint position_;
-    wxSize m_panelSize;
-    wxSize m_fullSize;
-    wxSize m_scaledSize;
+    wxString m_filename = "";
+    wxPoint position_ = wxPoint(0, 0);
+    wxSize m_panelSize = wxSize(0, 0);
+    wxSize m_fullSize = wxSize(0, 0);
+    wxSize m_scaledSize = wxSize(0, 0);
     wxStaticBitmap *m_bitmapDisplay;
 };

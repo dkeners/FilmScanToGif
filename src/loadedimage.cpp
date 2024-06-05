@@ -6,14 +6,7 @@
 
 
 // Constructors
-Image::Image() : wxImage() {
-    m_filename = "";
-    position_ = wxPoint(0, 0);
-    m_panelSize = wxSize(0, 0);
-    m_fullSize = wxSize(0, 0);
-    m_scaledSize = wxSize(0, 0);
-    m_scale = 1.0;
-}
+Image::Image() : wxImage() {}
 
 Image::Image(const wxString &filename, wxPoint position, wxSize imageSize, wxSize scaledSize, double scale)
     : m_filename(filename), position_(position), m_fullSize(imageSize), m_scaledSize(scaledSize), m_scale(scale) {
@@ -156,6 +149,45 @@ void Image::ScaleImage(wxStaticBitmap *bitmapDisplay)
     bitmapDisplay->SetPosition(position_);
 }
 
+void Image::FitImage(wxStaticBitmap *bitmapDisplay)
+{
+    if (!this->IsOk())
+    {
+        wxMessageBox("Image is not loaded properly.", "Error", wxICON_ERROR);
+        return;
+    }
+
+    m_fullSize = GetSize();
+    int width = m_fullSize.x;
+    int height = m_fullSize.y;
+
+    // Check if the panel size is fully specified. TODO: Find a better way to handle this.
+    if (m_panelSize == wxSize(0, 0))
+    {
+        throw std::runtime_error("Panel size is not fully specified in Image.");
+    }
+    
+    int panelWidth = m_panelSize.x;
+    int panelHeight = m_panelSize.y;
+
+    m_scale = 1.0;
+    
+    if (width > panelWidth && height > panelHeight)
+    {
+        double scale_width = panelWidth / (double)width;
+        double scale_height = panelHeight / (double)height;
+        m_scale = (scale_width < scale_height) ? scale_width : scale_height;
+    } else if (height > panelHeight)
+    {
+        m_scale = panelHeight / (double)height;
+    } else if (width > panelWidth)
+    {
+        m_scale = panelWidth / (double)width;
+    }
+
+    ScaleImage(bitmapDisplay);
+}
+
 void Image::LoadAndScaleImage(wxString filename, wxStaticBitmap *bitmapDisplay)
 {
     m_filename = filename;
@@ -192,12 +224,12 @@ void Image::LoadAndScaleImage(wxString filename, wxStaticBitmap *bitmapDisplay)
     ScaleImage(bitmapDisplay);
 }
 
-wxImage Image::CustomSubImage(SubBmpRect rect)
+Image Image::CustomSubImage(SubBmpRect rect)
 {
     if (!this->IsOk())
     {
         wxMessageBox("Image is not loaded properly.", "Error", wxICON_ERROR);
-        return wxImage();
+        return Image();
     } else {
         wxMessageBox("Rect is not empty. Details: " + wxString::Format("x: %d, y: %d, width: %d, height: %d", rect.x, rect.y, rect.width, rect.height), "Info", wxICON_INFORMATION);
         rect.Offset(-position_.x, -position_.y);
@@ -212,10 +244,6 @@ wxImage Image::CustomSubImage(SubBmpRect rect)
     Image image;
 
     wxCHECK_MSG( IsOk(), image, wxT("invalid image") );
-
-    wxCHECK_MSG( (rect.GetLeft()>=0) && (rect.GetTop()>=0) &&
-                 (rect.GetRight()<=GetWidth()) && (rect.GetBottom()<=GetHeight()),
-                 image, wxT("invalid subimage size") );
 
     int left = rect.GetLeft();
     int top = rect.GetTop();
@@ -239,43 +267,47 @@ wxImage Image::CustomSubImage(SubBmpRect rect)
         bottom = GetHeight();
     }
 
-    const int subwidth = rect.GetWidth();
-    const int subheight = rect.GetHeight();
+    wxCHECK_MSG( (left>=0) && (top>=0) &&
+                 (right<=GetWidth()) && (bottom<=GetHeight()),
+                 image, wxT("invalid subimage size") );
+
+    const int subwidth = right - left;
+    const int subheight = bottom - top;
 
     image.Create( subwidth, subheight, false );
 
     const unsigned char *src_data = GetData();
-    const unsigned char *src_alpha = M_IMGDATA->m_alpha;
+    // const unsigned char *src_alpha = M_IMGDATA->m_alpha;
     unsigned char *subdata = image.GetData();
-    unsigned char *subalpha = NULL;
+    // unsigned char *subalpha = NULL;
 
     wxCHECK_MSG( subdata, image, wxT("unable to create image") );
 
-    if ( src_alpha ) {
-        image.SetAlpha();
-        subalpha = image.GetAlpha();
-        wxCHECK_MSG( subalpha, image, wxT("unable to create alpha channel"));
-    }
+    // if ( src_alpha ) {
+    //     image.SetAlpha();
+    //     subalpha = image.GetAlpha();
+    //     wxCHECK_MSG( subalpha, image, wxT("unable to create alpha channel"));
+    // }
 
-    if (M_IMGDATA->m_hasMask)
-        image.SetMaskColour( M_IMGDATA->m_maskRed, M_IMGDATA->m_maskGreen, M_IMGDATA->m_maskBlue );
+    // if (M_IMGDATA->m_hasMask)
+    //     image.SetMaskColour( M_IMGDATA->m_maskRed, M_IMGDATA->m_maskGreen, M_IMGDATA->m_maskBlue );
 
     const int width = GetWidth();
-    const int pixsoff = rect.GetLeft() + width * rect.GetTop();
+    const int pixsoff = left + width * top;
 
     src_data += 3 * pixsoff;
-    src_alpha += pixsoff; // won't be used if was NULL, so this is ok
+    // src_alpha += pixsoff; // won't be used if was NULL, so this is ok
 
     for (long j = 0; j < subheight; ++j)
     {
         memcpy( subdata, src_data, 3 * subwidth );
         subdata += 3 * subwidth;
         src_data += 3 * width;
-        if (subalpha != NULL) {
-            memcpy( subalpha, src_alpha, subwidth );
-            subalpha += subwidth;
-            src_alpha += width;
-        }
+        // if (subalpha != NULL) {
+        //     memcpy( subalpha, src_alpha, subwidth );
+        //     subalpha += subwidth;
+        //     src_alpha += width;
+        // }
     }
 
     return image;

@@ -195,7 +195,7 @@ MyFrame::MyFrame() : wxFrame(NULL, wxID_ANY, "FilmScanMotion")
     wxRadioButton *radio_button_image_choice3 = new wxRadioButton(this, wxID_ANY, "Image 3");
     wxButton *button_image_choice = new wxButton(this, wxID_ANY, "Select Image", wxDefaultPosition, wxSize(100, 40));
     button_image_choice->Bind(wxEVT_COMMAND_BUTTON_CLICKED, [this](wxCommandEvent& event) {
-        wxImage subImage = image.CustomSubImage(layout_manager.frames_["1"]);
+        Image subImage = image.CustomSubImage(layout_manager.frames_["1"]);
         croppedImgWindow = new CroppedImgWindow(this, wxString("Cropped Image"), &subImage);
         croppedImgWindow->Show(true);
         });
