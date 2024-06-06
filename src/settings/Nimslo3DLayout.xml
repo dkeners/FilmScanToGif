@@ -10,13 +10,22 @@
     </layoutInfo>
     <animationInfo>
 		<frameTiming>
-		    <default>
-		        100
-		    </default>
-		    <a1>
-                150
-            </a1>
-		</frameTiming>
+            <default>
+                <time>100</time>
+            </default>
+            <slowFast>
+                <time>150</time>
+                <time>100</time>
+            </slowFast>
+            <slowdown>
+                <time>100</time>
+                <time>125</time>
+                <time>150</time>
+                <time>175</time>
+                <time>200</time>
+                <time>225</time>
+            </slowdown>
+        </frameTiming>
         <animationOrder>
             <default totalFrames="6">
                 <frame>1</frame>
@@ -26,6 +35,14 @@
                 <frame>3</frame>
                 <frame>2</frame>
             </default>
+            <reverse totalFrames="6">
+                <frame>4</frame>
+                <frame>3</frame>
+                <frame>2</frame>
+                <frame>1</frame>
+                <frame>2</frame>
+                <frame>3</frame>
+            </reverse>
         </animationOrder>
 	</animationInfo>
     <frameInfo>

@@ -1,6 +1,8 @@
 #pragma once
 
 #include "subbmprect.h"
+#include "framesequence.h"
+#include "frametiming.h"
 
 #include <map>
 
@@ -9,22 +11,37 @@
 
 class LayoutManager
 {
-private:
-    const wxString layoutsFilename_ = "layouts.xml";
-    // const wxString layoutsPath_     = wxStandardPaths::Get().GetUserDataDir() + "\\rss\\"; USE THIS WHEN MOVING TO CORRECT PATH
-    const wxString layoutsPath_     = wxStandardPaths::Get().GetResourcesDir() + "\\settings\\";
-
-    int currentLayoutIndex_;
-    
 public:
-    wxString defaultLayout_;
-    wxArrayString layouts_;
-    wxArrayString layoutsFileArray_;
-    wxArrayString layoutsImgArray_;
-
-    std::map<wxString, SubBmpRect> frames_;
-
     LayoutManager();
-    bool loadLayout(wxString layoutName = "default");
     ~LayoutManager();
+
+    bool loadLayout(wxString layoutName = "default");
+    wxString getLayoutName();
+    SubBmpRect getFrame(wxString frameName);   
+
+private:
+    const wxString LAYOUTS_FILENAME = "layouts.xml";
+    // CHANGE BELOW TO (for release):                  Get().GetUserDataDir() + "\\settings\\";
+    const wxString LAYOUTS_PATH     = wxStandardPaths::Get().GetResourcesDir() + "\\settings\\";
+
+    // Initial variables
+    wxString m_defaultLayout;
+    wxArrayString m_layouts;
+    wxArrayString m_layoutsFileArray;
+    wxArrayString m_layoutsImgArray;
+
+    // LayoutInfo variables
+    wxString m_layoutName;
+    int m_frameCount;
+    wxSize m_layoutSize;
+
+    // Animation variables
+    FrameTimingMap m_frameTimings;
+    FrameSequenceMap m_frameSequences;
+
+    // Frame variables
+    std::map<wxString, SubBmpRect> m_frames;
+
+    int m_currentLayoutIndex;
+    
 };

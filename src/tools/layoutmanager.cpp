@@ -5,19 +5,16 @@
 LayoutManager::LayoutManager()
 {
     wxXmlDocument doc;
-    if (!doc.Load(layoutsPath_ + layoutsFilename_))
+    if (!doc.Load(LAYOUTS_PATH + LAYOUTS_FILENAME))
     {
-        wxLogError("Failed to load layout file: %s", layoutsPath_ + layoutsFilename_);
+        wxLogError("Failed to load layout file: %s", LAYOUTS_PATH + LAYOUTS_FILENAME);
     }
-
-    wxLogMessage("Loaded layout file: %s", layoutsPath_ + layoutsFilename_);
-
 
     wxXmlNode *root = doc.GetDocumentNode()->GetChildren();
 
     if (root->GetName() != "layouts")
     {
-        wxLogError("Invalid layout file: %s", layoutsPath_ + layoutsFilename_);
+        wxLogError("Invalid layout file: %s", LAYOUTS_PATH + LAYOUTS_FILENAME);
     }
 
     wxXmlNode *layoutsNode = root->GetChildren();
@@ -26,53 +23,47 @@ LayoutManager::LayoutManager()
         if (layoutsNode->GetName() == "layout")
         {
             wxString name = layoutsNode->GetAttribute("name");
-            // wxString layoutFile_ = layoutsPath_ + layoutsNode->GetAttribute("layoutFile");
-            // wxString layoutImg_ = layoutsPath_ + layoutsNode->GetAttribute("layoutImg");
-            wxString layoutFile_ = layoutsNode->GetAttribute("layoutFile");
-            wxString layoutImg_ = layoutsNode->GetAttribute("layoutImg");
-            wxLogMessage("Layout: %s. Files located at: %s, %s", name, layoutFile_, layoutImg_);
-            layouts_.Add(name);
-            layoutsFileArray_.Add(layoutFile_);
-            layoutsImgArray_.Add(layoutImg_);
+            wxString layoutFile = layoutsNode->GetAttribute("layoutFile");
+            wxString layoutImg = layoutsNode->GetAttribute("layoutImg");
+            m_layouts.Add(name);
+            m_layoutsFileArray.Add(layoutFile);
+            m_layoutsImgArray.Add(layoutImg);
         }
         layoutsNode = layoutsNode->GetNext();
     }
 
-    defaultLayout_ = root->GetAttribute("default");
-    // wxLogMessage("Default layout: %s", defaultLayout_);
-    layouts_.Shrink();
-    layoutsFileArray_.Shrink();
-    layoutsImgArray_.Shrink();
-    // wxLogMessage("Loaded %i layouts", layouts_.GetCount());
+    m_defaultLayout = root->GetAttribute("default");
+
+    m_layouts.Shrink();
+    m_layoutsFileArray.Shrink();
+    m_layoutsImgArray.Shrink();
 }
 
 bool LayoutManager::loadLayout(wxString layoutName)
 {
     if (layoutName == "default") {
-        layoutName = defaultLayout_;
+        layoutName = m_defaultLayout;
     }
 
-    currentLayoutIndex_ = layouts_.Index(layoutName);
-    if (currentLayoutIndex_ == wxNOT_FOUND)
+    m_currentLayoutIndex = m_layouts.Index(layoutName);
+    if (m_currentLayoutIndex == wxNOT_FOUND)
     {
         wxLogError("Layout not found: %s", layoutName);
         return false;
     }
 
     wxXmlDocument doc;
-    if (!doc.Load(layoutsPath_ + layoutsFileArray_[currentLayoutIndex_]))
+    if (!doc.Load(LAYOUTS_PATH + m_layoutsFileArray[m_currentLayoutIndex]))
     {
-        wxLogError("Failed to load layout file: %s", layoutsPath_ + layoutsFileArray_[currentLayoutIndex_]);
+        wxLogError("Failed to load layout file: %s", LAYOUTS_PATH + m_layoutsFileArray[m_currentLayoutIndex]);
         return false;
     }
-
-    wxLogMessage("Loaded layout file: %s", layoutsPath_ + layoutsFileArray_[currentLayoutIndex_]);
 
     wxXmlNode *root = doc.GetDocumentNode()->GetChildren();
 
     if (root->GetName() != "layout")
     {
-        wxLogError("Invalid layout file: %s", layoutsPath_ + layoutsFileArray_[currentLayoutIndex_]);
+        wxLogError("Invalid layout file: %s", LAYOUTS_PATH + m_layoutsFileArray[m_currentLayoutIndex]);
         return false;
     }
 
@@ -87,25 +78,27 @@ bool LayoutManager::loadLayout(wxString layoutName)
             {
                 if (layoutInfo->GetName() == "name")
                 {
-                    wxLogMessage("Camera Info: %s", layoutInfo->GetNodeContent());
+                    m_layoutName = layoutInfo->GetNodeContent();
                 } else if (layoutInfo->GetName() == "frames") {
-                    wxLogMessage("Layout total frames: %s", layoutInfo->GetNodeContent());
+                    m_frameCount = wxAtoi(layoutInfo->GetNodeContent());
                 } else if (layoutInfo->GetName() == "layoutSize") {
+                    int width, height;
+
                     wxXmlNode *dimensions = layoutInfo->GetChildren();
                     while (dimensions)
                     {
                         if (dimensions->GetName() == "width")
                         {
-                            wxLogMessage("Layout width: %s", dimensions->GetNodeContent());
+                            width = wxAtoi(dimensions->GetNodeContent());
                         } else if (dimensions->GetName() == "height") {
-                            wxLogMessage("Layout height: %s", dimensions->GetNodeContent());
+                            height = wxAtoi(dimensions->GetNodeContent());
                         }
                         dimensions = dimensions->GetNext();
                     }
+                    m_layoutSize = wxSize(width, height);
                 }
                 layoutInfo = layoutInfo->GetNext();
             }
-            wxLogMessage("Camera Info: %s", layoutNode->GetAttribute("name"));
         }
         // Animation Info Node Logic (frameTiming, animationOrder)
         else if (layoutNode->GetName() == "animationInfo") {
@@ -113,30 +106,48 @@ bool LayoutManager::loadLayout(wxString layoutName)
             while (animationInfo)
             {
                 if (animationInfo->GetName() == "frameTiming") {
+                    m_frameTimings.clear();
                     wxXmlNode *frameTiming = animationInfo->GetChildren();
                     while (frameTiming)
                     {
-                        if (frameTiming->GetName() == "default") {
-                            wxLogMessage("Default frame timing: %s", frameTiming->GetNodeContent());
-                        } else {
-                            wxLogMessage("%s Frame timing: %s", frameTiming->GetName(), frameTiming->GetNodeContent());
+                        wxString name = frameTiming->GetName();
+
+                        wxArrayInt timings;
+                        wxXmlNode *timeNode = frameTiming->GetChildren();
+                        while (timeNode)
+                        {
+                            if (timeNode->GetName() == "time") {
+                                timings.Add(wxAtoi(timeNode->GetNodeContent()));
+                            }
+                            timeNode = timeNode->GetNext();
                         }
+
+                        FrameTiming timing = {timings};
+                        m_frameTimings[name] = timing;
+
                         frameTiming = frameTiming->GetNext();
                     }
                 } else if (animationInfo->GetName() == "animationOrder") {
+                    m_frameSequences.clear();
                     wxXmlNode *order = animationInfo->GetChildren();
                     while (order)
                     {
-                        if (order->GetName() == "default") {
-                            wxXmlNode *orderNode = order->GetChildren();
-                            while (orderNode)
-                            {
-                                wxLogMessage("Default order: %s", orderNode->GetNodeContent());
-                                orderNode = orderNode->GetNext();
+                        wxString name = order->GetName();
+                        int totalFrames = wxAtoi(order->GetAttribute("totalFrames"));
+
+                        wxArrayString frames;
+                        wxXmlNode *frameNode = order->GetChildren();
+                        while (frameNode)
+                        {
+                            if (frameNode->GetName() == "frame") {
+                                frames.Add(frameNode->GetNodeContent());
                             }
-                        } else {
-                            wxLogMessage("%s Order: %s", order->GetName(), order->GetNodeContent());
+                            frameNode = frameNode->GetNext();
                         }
+
+                        FrameSequence sequence = {totalFrames, frames};
+                        m_frameSequences[name] = sequence;
+
                         order = order->GetNext();
                     }
                 }
@@ -145,10 +156,11 @@ bool LayoutManager::loadLayout(wxString layoutName)
         }
         // Frame Node Logic (name, x, y, width, height)
         else if (layoutNode->GetName() == "frameInfo") {
+            m_frames.clear();
+            
             wxXmlNode *frame = layoutNode->GetChildren();
             while (frame)
             {
-                wxLogMessage("Frame: %s", frame->GetAttribute("name"));
                 wxString name = frame->GetAttribute("name");
                 int x, y, width, height;
 
@@ -157,29 +169,32 @@ bool LayoutManager::loadLayout(wxString layoutName)
                 {
                     if (frameInfo->GetName() == "x") {
                         x = wxAtoi(frameInfo->GetNodeContent());
-                        wxLogMessage("X: %s", frameInfo->GetNodeContent());
                     } else if (frameInfo->GetName() == "y") {
                         y = wxAtoi(frameInfo->GetNodeContent());
-                        wxLogMessage("Y: %s", frameInfo->GetNodeContent());
                     } else if (frameInfo->GetName() == "width") {
                         width = wxAtoi(frameInfo->GetNodeContent());
-                        wxLogMessage("Width: %s", frameInfo->GetNodeContent());
                     } else if (frameInfo->GetName() == "height") {
                         height = wxAtoi(frameInfo->GetNodeContent());
-                        wxLogMessage("Height: %s", frameInfo->GetNodeContent());
                     }
                     frameInfo = frameInfo->GetNext();
                 }
-                frames_[name] = SubBmpRect(x, y, width, height);
-                wxLogMessage("Frame: %i, %i, %i, %i", frames_[name].GetX(), frames_[name].GetY(), frames_[name].GetWidth(), frames_[name].GetHeight());
+                m_frames[name] = SubBmpRect(x, y, width, height);
                 frame = frame->GetNext();
             }
         }
         layoutNode = layoutNode->GetNext();
     }
-    
-
     return true;
+}
+
+wxString LayoutManager::getLayoutName()
+{
+    return m_layoutName;
+}
+
+SubBmpRect LayoutManager::getFrame(wxString frameName)
+{
+    return m_frames[frameName];
 }
 
 LayoutManager::~LayoutManager()

@@ -25,7 +25,6 @@ class MyFrame : public wxFrame
 public:
     MyFrame();
 private:
-    void OnHello(wxCommandEvent& event);
     void OnOpen(wxCommandEvent& event);
     void OnNew(wxCommandEvent& event);
     void OnSave(wxCommandEvent& event);
@@ -142,7 +141,7 @@ MyFrame::MyFrame() : wxFrame(NULL, wxID_ANY, "FilmScanMotion")
     // END INIT APP STATUS BAR
 
     if (layout_manager.loadLayout()) {
-        SetStatusText("Welcome to FilmScanMotion! Loaded default layout: " + layout_manager.defaultLayout_);
+        SetStatusText("Welcome to FilmScanMotion! Loaded default layout: " + layout_manager.getLayoutName());
     } else {
         wxLogError("Failed to load default layout!");
     }
@@ -172,8 +171,7 @@ MyFrame::MyFrame() : wxFrame(NULL, wxID_ANY, "FilmScanMotion")
     m_static_bitmap = new wxStaticBitmap(panel_image, wxID_ANY, wxNullBitmap, wxDefaultPosition, m_imagepanel_size, wxBORDER_NONE, "Image");
     m_static_bitmap->SetBackgroundColour(wxColour(wxTransparentColour));
     m_static_bitmap->Show();
-    wxLogMessage("Static Bitmaps size: %d x %d", m_static_bitmap->GetSize().GetWidth(), m_static_bitmap->GetSize().GetHeight());
-
+   
     // BUTTON CONTROLS
     BitmapTransforms controls_(m_static_bitmap, &image, this);
     controls_.loadAllControls();
@@ -195,7 +193,7 @@ MyFrame::MyFrame() : wxFrame(NULL, wxID_ANY, "FilmScanMotion")
     wxRadioButton *radio_button_image_choice3 = new wxRadioButton(this, wxID_ANY, "Image 3");
     wxButton *button_image_choice = new wxButton(this, wxID_ANY, "Select Image", wxDefaultPosition, wxSize(100, 40));
     button_image_choice->Bind(wxEVT_COMMAND_BUTTON_CLICKED, [this](wxCommandEvent& event) {
-        Image subImage = image.CustomSubImage(layout_manager.frames_["1"]);
+        Image subImage = image.CustomSubImage(layout_manager.getFrame("1"));
         croppedImgWindow = new CroppedImgWindow(this, wxString("Cropped Image"), &subImage);
         croppedImgWindow->Show(true);
         });
