@@ -2,7 +2,7 @@
 
 #include "tools/bitmaptransforms.h"
 
-CroppedImgWindow::CroppedImgWindow(wxFrame *parent, wxString title, Image *image)
+CroppedImgWindow::CroppedImgWindow(wxFrame *parent, wxString title, Image *subImage)
     : wxFrame(parent, wxID_ANY, title)
 {
     SetSize(600, 800);
@@ -10,13 +10,10 @@ CroppedImgWindow::CroppedImgWindow(wxFrame *parent, wxString title, Image *image
     wxBoxSizer *vbox = new wxBoxSizer(wxVERTICAL);
 
     // wxBitmap bitmap(wxT("D:\\Nextcloud\\Documents\\Code\\wxWidgetsTests\\src\\settings\\Nimslo3DLayout.png"), wxBITMAP_TYPE_PNG);
-    wxStaticBitmap *sb = new wxStaticBitmap(this, wxID_ANY, *image);
+    wxStaticBitmap *sb = new wxStaticBitmap(this, wxID_ANY, *subImage);
     sb->SetSize(wxSize(600, 600));
-        // wxMessageBox("Using scale mode: " + std::to_string(sb->GetScaleMode()));
-    // sb->SetScaleMode(wxStaticBitmap::Scale_AspectFit);
-    // wxMessageBox("Using scale mode: " + std::to_string(sb->GetScaleMode()));
-    image->setPanelSize(600, 600);
-    image->FitImage(sb);
+    subImage->setPanelSize(600, 600);
+    subImage->FitImage(sb);
     vbox->Add(sb, 0, wxALL, 10);
 
     // ascii loading spinner
@@ -27,7 +24,7 @@ CroppedImgWindow::CroppedImgWindow(wxFrame *parent, wxString title, Image *image
     m_timer.Start(150);  // Start the timer to fire every 100ms
     
     // BUTTON CONTROLS
-    BitmapTransforms controls_(sb, image, this);
+    BitmapTransforms controls_(sb, subImage, this);
     controls_.loadMoveControls();
 
     // Export Image
