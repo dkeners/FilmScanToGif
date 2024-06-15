@@ -19,8 +19,8 @@
         {
             "name": "Mac",
             "includePath": [
-                "${workspaceFolder}/src/",
-                "${workspaceFolder}/build/_deps/wxwidgets-src/include/"
+                "${workspaceFolder}/src/**",
+                "${workspaceFolder}/build/_deps/wxwidgets-src/include/**"
             ],
             "defines": [
                 "__WXOSX_COCOA__",

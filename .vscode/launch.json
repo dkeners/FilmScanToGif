@@ -5,21 +5,21 @@
             "name": "(lldb-mac) Launch",
             "type": "lldb",
             "request": "launch",
-            "program": "${workspaceFolder}/build/main.app",
+            "program": "${workspaceFolder}/build/FilmScanToGif.app",
             "preLaunchTask": "Build with CMake"
         },
         {
             "name": "(lldb-linux) Launch",
             "type": "lldb",
             "request": "launch",
-            "program": "${workspaceFolder}/build/main",
+            "program": "${workspaceFolder}/build/FilmScanToGif",
             "preLaunchTask": "Build with CMake"
         },
         {
             "name": "(msvc) Launch",
             "type": "cppvsdbg",
             "request": "launch",
-            "program": "${workspaceFolder}\\build\\Debug\\main.exe",
+            "program": "${workspaceFolder}\\build\\Debug\\FilmScanToGif.exe",
             "preLaunchTask": "Build with CMake"
         }
     ]
