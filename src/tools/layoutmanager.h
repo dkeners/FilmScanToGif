@@ -23,7 +23,7 @@ public:
 private:
     const wxString LAYOUTS_FILENAME = "layouts.xml";
     // CHANGE BELOW TO (for release):                  Get().GetUserDataDir() + "\\settings\\";
-    const wxString LAYOUTS_PATH     = wxStandardPaths::Get().GetResourcesDir() + "\\settings\\";
+    const wxString LAYOUTS_PATH     = wxStandardPaths::Get().GetResourcesDir() + "/settings/";
 
     // Initial variables
     wxString m_defaultLayout;
