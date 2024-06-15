@@ -1,7 +1,5 @@
 #include "layoutmanager.h"
 
-#include <wx/xml/xml.h>
-
 LayoutManager::LayoutManager()
 {
     wxXmlDocument doc;

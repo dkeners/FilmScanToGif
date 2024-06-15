@@ -7,6 +7,7 @@
 #include <map>
 
 #include <wx/wx.h>
+#include <wx/xml/xml.h>
 #include <wx/stdpaths.h>
 
 class LayoutManager
