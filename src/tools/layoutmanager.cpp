@@ -5,7 +5,8 @@ LayoutManager::LayoutManager()
     wxXmlDocument doc;
     if (!doc.Load(LAYOUTS_PATH + LAYOUTS_FILENAME))
     {
-        wxLogError("Failed to load layout file: %s", LAYOUTS_PATH + LAYOUTS_FILENAME);
+        wxLogError("Failed to load layout file: %s\nPlease load a layout before attempting any actions.", LAYOUTS_PATH + LAYOUTS_FILENAME);
+        return;
     }
 
     wxXmlNode *root = doc.GetDocumentNode()->GetChildren();
