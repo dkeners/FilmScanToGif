@@ -1,5 +1,4 @@
-#include "BitmapTransforms.h"
-#include "../LoadedImage.h"
+#include "bitmaptransforms.h"
 
 BitmapTransforms::BitmapTransforms(wxStaticBitmap *bitmap, Image *image, wxWindow *parent)
     : staticBitmap_(bitmap), image_(image), parent_(parent) {};

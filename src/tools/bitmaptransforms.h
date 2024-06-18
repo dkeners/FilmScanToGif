@@ -1,7 +1,7 @@
 #pragma once
 
 #include <wx/wx.h>
-#include "../LoadedImage.h"
+#include "../loadedimage.h"
 
 /**
  * @brief The BitmapTransforms class provides a set of functions for transforming bitmaps.
