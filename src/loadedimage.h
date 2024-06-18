@@ -42,6 +42,12 @@ public:
 
     int getPositionY() const;
 
+    wxPoint getMarkedPoint() const;
+
+    int getMarkedPointX() const;
+
+    int getMarkedPointY() const;
+
     wxSize getPanelSize() const;
 
     int getPanelWidth() const;
@@ -68,6 +74,10 @@ public:
     void setPosition(const wxPoint &position);
 
     void setPosition(int x, int y);
+
+    void setMarkedPoint(const wxPoint &point);
+
+    void setMarkedPoint(int x, int y);
 
     void setPanelSize(const wxSize &size);
 
@@ -159,7 +169,8 @@ public:
 
 private:
     wxString m_filename = "";
-    wxPoint position_ = wxPoint(0, 0);
+    wxPoint m_position = wxPoint(0, 0);
+    wxPoint m_markedPoint = wxPoint(0, 0);
     wxSize m_panelSize = wxSize(0, 0);
     wxSize m_fullSize = wxSize(0, 0);
     wxSize m_scaledSize = wxSize(0, 0);

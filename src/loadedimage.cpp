@@ -9,7 +9,7 @@
 Image::Image() : wxImage() {}
 
 Image::Image(const wxString &filename, wxPoint position, wxSize imageSize, wxSize scaledSize, double scale)
-    : m_filename(filename), position_(position), m_fullSize(imageSize), m_scaledSize(scaledSize), m_scale(scale) {
+    : m_filename(filename), m_position(position), m_fullSize(imageSize), m_scaledSize(scaledSize), m_scale(scale) {
     // Load the image from the file
     LoadFile(filename);
 }
@@ -20,15 +20,27 @@ wxString Image::getFilename() const {
 }
 
 wxPoint Image::getPosition() const {
-    return position_;
+    return m_position;
 }
 
 int Image::getPositionX() const {
-    return position_.x;
+    return m_position.x;
 }
 
 int Image::getPositionY() const {
-    return position_.y;
+    return m_position.y;
+}
+
+wxPoint Image::getMarkedPoint() const {
+    return m_markedPoint;
+}
+
+int Image::getMarkedPointX() const {
+    return m_markedPoint.x;
+}
+
+int Image::getMarkedPointY() const {
+    return m_markedPoint.y;
 }
 
 wxSize Image::getPanelSize() const {
@@ -77,11 +89,11 @@ void Image::setFilename(const wxString &filename) {
 }
 
 void Image::setPosition(const wxPoint &position) {
-    position_ = position;
+    m_position = position;
 }
 
 void Image::setPosition(int x, int y) {
-    position_ = wxPoint(x, y);
+    m_position = wxPoint(x, y);
 }
 
 void Image::setPanelSize(const wxSize &size) {
@@ -139,14 +151,14 @@ void Image::ScaleImage(wxStaticBitmap *bitmapDisplay)
 
     m_scaledSize = m_fullSize * m_scale;
 
-    position_ = wxPoint((m_panelSize.x - m_scaledSize.x) / 2, (m_panelSize.y - m_scaledSize.y) / 2);
+    m_position = wxPoint((m_panelSize.x - m_scaledSize.x) / 2, (m_panelSize.y - m_scaledSize.y) / 2);
     
     wxImage scaledImage = (*this).Copy();
     scaledImage.Rescale(m_scaledSize.GetWidth(), m_scaledSize.GetHeight(), wxIMAGE_QUALITY_HIGH);
 
     bitmapDisplay->SetBitmap(scaledImage);
     bitmapDisplay->SetSize(m_scaledSize);
-    bitmapDisplay->SetPosition(position_);
+    bitmapDisplay->SetPosition(m_position);
 }
 
 void Image::FitImage(wxStaticBitmap *bitmapDisplay)
@@ -232,7 +244,7 @@ Image Image::CustomSubImage(SubBmpRect rect)
         return Image();
     } else {
         wxMessageBox("Rect is not empty. Details: " + wxString::Format("x: %d, y: %d, width: %d, height: %d", rect.x, rect.y, rect.width, rect.height), "Info", wxICON_INFORMATION);
-        rect.Offset(-position_.x, -position_.y);
+        rect.Offset(-m_position.x, -m_position.y);
         wxMessageBox("Rect has been offset. Details: " + wxString::Format("x: %d, y: %d, width: %d, height: %d", rect.x, rect.y, rect.width, rect.height), "Info", wxICON_INFORMATION);
         rect.scaleFrame((double)(1 / m_scale));
         wxMessageBox("Rect has been scaled. Details: " + wxString::Format("x: %d, y: %d, width: %d, height: %d", rect.x, rect.y, rect.width, rect.height), "Info", wxICON_INFORMATION);
@@ -328,24 +340,24 @@ void Image::zoomOut(wxStaticBitmap *bitmapDisplay)
 
 void Image::moveLeft(wxStaticBitmap *bitmapDisplay, int step)
 {
-    position_.x -= step;
-    bitmapDisplay->SetPosition(position_);
+    m_position.x -= step;
+    bitmapDisplay->SetPosition(m_position);
 }
 
 void Image::moveRight(wxStaticBitmap *bitmapDisplay, int step)
 {
-    position_.x += step;
-    bitmapDisplay->SetPosition(position_);
+    m_position.x += step;
+    bitmapDisplay->SetPosition(m_position);
 }
 
 void Image::moveUp(wxStaticBitmap *bitmapDisplay, int step)
 {
-    position_.y -= step;
-    bitmapDisplay->SetPosition(position_);
+    m_position.y -= step;
+    bitmapDisplay->SetPosition(m_position);
 }
 
 void Image::moveDown(wxStaticBitmap *bitmapDisplay, int step)
 {
-    position_.y += step;
-    bitmapDisplay->SetPosition(position_);
+    m_position.y += step;
+    bitmapDisplay->SetPosition(m_position);
 }
