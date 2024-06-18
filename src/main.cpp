@@ -13,6 +13,7 @@
 #include "loadedimage.h"
 #include "tools/bitmaptransforms.h"
 #include "tools/layoutmanager.h"
+#include "tools/animator.h"
 
 class MyApp : public wxApp 
 {
@@ -204,10 +205,19 @@ MyFrame::MyFrame() : wxFrame(NULL, wxID_ANY, "FilmScanMotion")
     sizer_image_selector->Add(button_image_choice, 0, wxALIGN_CENTER_VERTICAL | wxTOP | wxBOTTOM, 5);
     // END IMAGE SELECTOR CONTROLS
 
+    // ANIMATION CONTROLS
+    wxBoxSizer *sizer_animation_controls = new wxBoxSizer(wxHORIZONTAL);
+    wxButton *button_play = new wxButton(this, wxID_ANY, "Set Image Alignments", wxDefaultPosition, wxSize(100, 40));
+    button_play->Bind(wxEVT_COMMAND_BUTTON_CLICKED, [this](wxCommandEvent& event) {
+        Animator::FrameAlignment(&layout_manager, &image);
+        });
+    sizer_animation_controls->Add(button_play, 0, wxALIGN_CENTER_VERTICAL | wxTOP | wxBOTTOM, 5);
+
     wxBoxSizer *sizer = new wxBoxSizer(wxVERTICAL);
     sizer->Add(panel_image, 0, wxEXPAND | wxALL, 10);
     sizer->Add(sizer_image_controls, 0, wxEXPAND | wxLEFT | wxRIGHT | wxBOTTOM, 10);
     sizer->Add(sizer_image_selector, 0, wxEXPAND | wxLEFT | wxRIGHT | wxBOTTOM, 10);
+    sizer->Add(sizer_animation_controls, 0, wxEXPAND | wxLEFT | wxRIGHT | wxBOTTOM, 10);
 
     this->SetSizerAndFit(sizer);
 }
