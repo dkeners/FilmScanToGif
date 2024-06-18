@@ -191,6 +191,16 @@ wxString LayoutManager::getLayoutName()
     return m_layoutName;
 }
 
+FrameTiming LayoutManager::getFrameTiming(wxString frameTimingName)
+{
+    return m_frameTimings[frameTimingName];
+}
+
+FrameSequence LayoutManager::getFrameSequence(wxString frameSequenceName)
+{
+    return m_frameSequences[frameSequenceName];
+}
+
 SubBmpRect LayoutManager::getFrame(wxString frameName)
 {
     return m_frames[frameName];
