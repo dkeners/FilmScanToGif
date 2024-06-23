@@ -7,8 +7,8 @@
 class FocalPointDialog : public wxDialog
 {
 public:
-    FocalPointDialog(wxWindow* parent, const wxString& title, wxImage* subImage1)
-        : wxDialog(parent, wxID_ANY, title)
+    FocalPointDialog(wxWindow* parent, const wxString& title, Image* subImage1)
+        : wxDialog(parent, wxID_ANY, title), subImage1(subImage1)
     {
         // Create a wxStaticBitmap to display the image
         wxStaticBitmap* bitmap = new wxStaticBitmap(this, wxID_ANY, *subImage1);
@@ -23,12 +23,15 @@ public:
     }
 
 private:
+    Image* subImage1;
+
     void OnClick(wxMouseEvent& event)
     {
         // Get the position of the mouse click
         wxPoint position = event.GetPosition();
 
         // Do something with the position...
+        subImage1->setMarkedPoint(position);
         wxLogMessage("Clicked at %d, %d", position.x, position.y);
 
         // Close the dialog
