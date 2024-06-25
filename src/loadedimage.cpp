@@ -251,12 +251,9 @@ Image Image::CustomSubImage(SubBmpRect rect)
         wxMessageBox("Image is not loaded properly.", "Error", wxICON_ERROR);
         return Image();
     } else {
-        wxMessageBox("Rect is not empty. Details: " + wxString::Format("x: %d, y: %d, width: %d, height: %d", rect.x, rect.y, rect.width, rect.height), "Info", wxICON_INFORMATION);
         rect.Offset(-m_position.x, -m_position.y);
-        wxMessageBox("Rect has been offset. Details: " + wxString::Format("x: %d, y: %d, width: %d, height: %d", rect.x, rect.y, rect.width, rect.height), "Info", wxICON_INFORMATION);
         rect.scaleFrame((double)(1 / m_scale));
-        wxMessageBox("Rect has been scaled. Details: " + wxString::Format("x: %d, y: %d, width: %d, height: %d", rect.x, rect.y, rect.width, rect.height), "Info", wxICON_INFORMATION);
-    }
+        }
     
     // This following bit may be bad but i don't know how to get Image type returned otherwise than writing 
     // (new Image())->SetData((*this).GetSubImage(rect).GetData());
