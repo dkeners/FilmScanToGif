@@ -38,7 +38,7 @@ private:
 
     // LayoutInfo variables
     wxString m_layoutName;
-    int m_frameCount;
+    int m_frameCount = 0;
     wxSize m_layoutSize;
 
     // Animation variables
