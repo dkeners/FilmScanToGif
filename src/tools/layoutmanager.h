@@ -22,6 +22,7 @@ public:
     FrameTiming getFrameTiming(wxString frameTimingName);
     FrameSequence getFrameSequence(wxString frameSequenceName);
 
+    int getFrameCount();
     SubBmpRect getFrame(wxString frameName);   
 
 private:
