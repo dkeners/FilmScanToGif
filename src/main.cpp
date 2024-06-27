@@ -209,7 +209,9 @@ MyFrame::MyFrame() : wxFrame(NULL, wxID_ANY, "FilmScanMotion")
     wxBoxSizer *sizer_animation_controls = new wxBoxSizer(wxHORIZONTAL);
     wxButton *button_play = new wxButton(this, wxID_ANY, "Set Image Alignments", wxDefaultPosition, wxSize(100, 40));
     button_play->Bind(wxEVT_COMMAND_BUTTON_CLICKED, [this](wxCommandEvent& event) {
-        Animator::FrameAlignment(&layout_manager, &image);
+        if (image.IsOk() && layout_manager.getFrameCount() > 0) {
+            Animator::FrameAlignment(&layout_manager, &image);
+        }
         });
     sizer_animation_controls->Add(button_play, 0, wxALIGN_CENTER_VERTICAL | wxTOP | wxBOTTOM, 5);
 
