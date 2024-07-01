@@ -75,6 +75,10 @@ public:
 
     void setPosition(int x, int y);
 
+    void setPositionX(int x);
+
+    void setPositionY(int y);
+
     void setMarkedPoint(const wxPoint &point);
 
     void setMarkedPoint(int x, int y);

@@ -96,6 +96,14 @@ void Image::setPosition(int x, int y) {
     m_position = wxPoint(x, y);
 }
 
+void Image::setPositionX(int x) {
+    m_position.x = x;
+}
+
+void Image::setPositionY(int y) {
+    m_position.y = y;
+}
+
 void Image::setMarkedPoint(const wxPoint &point) {
     m_markedPoint = point;
 }
