@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<layout>
+	<layoutInfo>
+		<name>Rensha Cardia BYU-n16</name>
+		<frames>16</frames>
+        <layoutSize>
+            <width>1200</width>
+            <height>400</height>
+        </layoutSize>
+    </layoutInfo>
+    <animationInfo>
+		<frameTiming>
+            <default>
+                <time>100</time>
+            </default>
+            <slowFast>
+                <time>150</time>
+                <time>100</time>
+            </slowFast>
+            <slowdown>
+                <time>100</time>
+                <time>125</time>
+                <time>150</time>
+                <time>175</time>
+                <time>200</time>
+                <time>225</time>
+            </slowdown>
+        </frameTiming>
+        <animationOrder>
+            <default totalFrames="16">
+                <frame>1</frame>
+                <frame>2</frame>
+                <frame>3</frame>
+                <frame>4</frame>
+                <frame>5</frame>
+                <frame>6</frame>
+                <frame>7</frame>
+                <frame>8</frame>
+                <frame>9</frame>
+                <frame>10</frame>
+                <frame>11</frame>
+                <frame>12</frame>
+                <frame>13</frame>
+                <frame>14</frame>
+                <frame>15</frame>
+                <frame>16</frame>
+            </default>
+        </animationOrder>
+	</animationInfo>
+    <frameInfo>
+    <!-- In order of shooting sequence -->
+        <frame name="1">
+            <x>11</x>
+            <y>39</y>
+            <width>157</width>
+            <height>156</height>
+        </frame>
+        <frame name="2">
+            <x>167</x>
+            <y>39</y>
+            <width>132</width>
+            <height>156</height>
+        </frame>
+        <frame name="3">
+            <x>299</x>
+            <y>39</y>
+            <width>132</width>
+            <height>156</height>
+        </frame>
+        <frame name="4">
+            <x>430</x>
+            <y>39</y>
+            <width>157</width>
+            <height>156</height>
+        </frame>
+        <frame name="5">
+            <x>612</x>
+            <y>39</y>
+            <width>157</width>
+            <height>156</height>
+        </frame>
+        <frame name="6">
+            <x>769</x>
+            <y>39</y>
+            <width>132</width>
+            <height>156</height>
+        </frame>
+        <frame name="7">
+            <x>900</x>
+            <y>39</y>
+            <width>132</width>
+            <height>156</height>
+        </frame>
+        <frame name="8">
+            <x>1033</x>
+            <y>39</y>
+            <width>157</width>
+            <height>156</height>
+        </frame>
+        <!-- Second Row -->
+        <frame name="9">
+            <x>11</x>
+            <y>195</y>
+            <width>157</width>
+            <height>169</height>
+        </frame>
+        <frame name="10">
+            <x>167</x>
+            <y>195</y>
+            <width>132</width>
+            <height>169</height>
+        </frame>
+        <frame name="11">
+            <x>299</x>
+            <y>195</y>
+            <width>132</width>
+            <height>169</height>
+        </frame>
+        <frame name="12">
+            <x>430</x>
+            <y>195</y>
+            <width>157</width>
+            <height>169</height>
+        </frame>
+        <frame name="13">
+            <x>612</x>
+            <y>195</y>
+            <width>157</width>
+            <height>169</height>
+        </frame>
+        <frame name="14">
+            <x>769</x>
+            <y>195</y>
+            <width>132</width>
+            <height>169</height>
+        </frame>
+        <frame name="15">
+            <x>900</x>
+            <y>195</y>
+            <width>132</width>
+            <height>169</height>
+        </frame>
+        <frame name="16">
+            <x>1033</x>
+            <y>195</y>
+            <width>157</width>
+            <height>169</height>
+        </frame>
+    </frameInfo>
+</layout>
