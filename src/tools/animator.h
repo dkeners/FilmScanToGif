@@ -13,6 +13,11 @@
  * @brief The Animator namespace contains classes and functions for animating images.
  */
 namespace Animator {
+    enum class ImageBorderCrop {
+        OuterEdge,
+        InnerEdge,
+    };
+
     // Methods to call a comparer window with the first and second images
     // void compareImages(wxString firstImage, wxString secondImage);
     void FrameAlignment(LayoutManager* lManager, Image* image, wxString animationName = "default");
