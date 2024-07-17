@@ -411,10 +411,25 @@ void MyFrame::ImageImport()
 void MyFrame::OnExport(wxCommandEvent& event)
 {
     SetStatusText("Exporting file...");
-    // Do real exporting here
-    wxLogMessage("File exported!");
-    // End of exporting
-    SetStatusText("File exported!");
+
+    switch (Animator::ExportAnimation(&layout_manager, "default", Animator::ImageBorderCrop::InnerEdge))
+    {
+    case 0:
+        SetStatusText("Error exporting file!");
+        break;
+
+    case 1:
+        SetStatusText("File exported!");
+        break;
+
+    case 2:
+        SetStatusText("File export canceled!");
+        break;
+    
+    default:
+        SetStatusText("Unknown error exporting file!");
+        break;
+    }
 }
 
 void MyFrame::OnExit(wxCommandEvent& event)
