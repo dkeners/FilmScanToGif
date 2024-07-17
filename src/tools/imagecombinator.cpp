@@ -56,32 +56,12 @@ namespace ImageCombinator
 
     void pixelCombine(wxImage *combinedImage, Image *image1, Image *image2)
     {
+        // Set new image2 location based on offset from image1
         wxPoint offsetImage2 = GetRelativeOffset(image1, image2);
-        // Offeset the same as the bounds location
-        int xImage1 = image1->getPositionX();
-        int yImage1 = image1->getPositionY();
+        image2->setPositionX(image2->getPositionX() + offsetImage2.x);
+        image2->setPositionY(image2->getPositionY() + offsetImage2.y);
 
-        int xImage2 = image2->getPositionX();
-        int yImage2 = image2->getPositionY();
-
-        // If image two is to the left of image one (negative offset), change image one base position to positive offset
-        if (offsetImage2.x < 0)
-        {
-            image1->setPositionX(xImage1 - offsetImage2.x);
-        } else if (offsetImage2.x > 0)
-        {
-            image2->setPositionX(xImage2 + offsetImage2.x);
-        }
-
-        // If image two is above image one (negative offset), change image one base position to positive offset
-        if (offsetImage2.y < 0)
-        {
-            image1->setPositionY(yImage1 - offsetImage2.y);
-        } else if (offsetImage2.y > 0)
-        {
-            image2->setPositionY(yImage2 + offsetImage2.y);
-        }
-
+        // Find top left of images to offset for data manipulation
         wxRect outerBounds = GetOuterBounds(image1, image2);
         wxRect innerBounds = GetInnerBounds(image1, image2);
 
@@ -89,18 +69,19 @@ namespace ImageCombinator
         outerBounds.SetPosition(wxPoint(0, 0));
         innerBounds.SetPosition(innerBounds.GetPosition() - boundsLocation);
 
+        // Create variables for relative offsets
+        int xImage1 = image1->getPositionX() - boundsLocation.x;
+        int yImage1 = image1->getPositionY() - boundsLocation.y;
+
+        int xImage2 = image2->getPositionX() - boundsLocation.x;
+        int yImage2 = image2->getPositionY() - boundsLocation.y;
+        
+        // Gather image data sources
         unsigned int pixelCount = combinedImage->GetWidth() * combinedImage->GetHeight();
         unsigned char *combinedData = combinedImage->GetData();
         unsigned char *image1Data = image1->GetData();
         unsigned char *image2Data = image2->GetData();
 
-        // Offeset the same as the bounds location
-        xImage1 = image1->getPositionX() - boundsLocation.x;
-        yImage1 = image1->getPositionY() - boundsLocation.y;
-
-        xImage2 = image2->getPositionX() - boundsLocation.x;
-        yImage2 = image2->getPositionY() - boundsLocation.y;
-        
         // Commented timer for performance testing
         // std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
         for (unsigned int i = 0; i < pixelCount * 3; i += 3)
