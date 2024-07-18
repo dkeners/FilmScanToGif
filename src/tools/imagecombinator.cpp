@@ -28,6 +28,14 @@ namespace ImageCombinator
         );
     }
 
+    void SetSecondImagePosition(Image* image1, Image* image2)
+    {
+        // Set new image2 location based on offset from image1
+        wxPoint offsetImage2 = GetRelativeOffset(image1, image2);
+        image2->setPositionX(image2->getPositionX() + offsetImage2.x);
+        image2->setPositionY(image2->getPositionY() + offsetImage2.y);
+    }
+
     wxRect GetOuterBounds(Image *image1, Image *image2)
     {
         // generate offsets based on marked points

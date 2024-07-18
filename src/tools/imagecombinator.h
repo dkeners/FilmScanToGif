@@ -23,6 +23,7 @@ namespace ImageCombinator
     // Methods to call a comparer window with the first and second images
     Image combineImages(Image *image1, Image *image2);
     wxPoint GetRelativeOffset(Image *image1, Image *image2);
+    void SetSecondImagePosition(Image *image1, Image *image2);
     wxRect GetOuterBounds(Image *image1, Image *image2);
     wxRect GetInnerBounds(Image *image1, Image *image2);
     void pixelCombine(wxImage *combinedImage, Image *image1, Image *image2);
