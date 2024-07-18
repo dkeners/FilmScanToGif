@@ -38,26 +38,20 @@ namespace ImageCombinator
 
     wxRect GetOuterBounds(Image *image1, Image *image2)
     {
-        // generate offsets based on marked points
-        wxPoint offsetImage2 = GetRelativeOffset(image1, image2);
-
-        int leftBound = std::min(image1->getPositionX(), offsetImage2.x);
-        int rightBound = std::max(image1->getPositionX() + image1->GetWidth(), offsetImage2.x + image2->GetWidth());
-        int topBound = std::min(image1->getPositionY(), offsetImage2.y);
-        int bottomBound = std::max(image1->getPositionY() + image1->GetHeight(), offsetImage2.y + image2->GetHeight());
+        int leftBound = std::min(image1->getPositionX(), image2->getPositionX());
+        int rightBound = std::max(image1->getPositionX() + image1->GetWidth(), image2->getPositionX() + image2->GetWidth());
+        int topBound = std::min(image1->getPositionY(), image2->getPositionY());
+        int bottomBound = std::max(image1->getPositionY() + image1->GetHeight(), image2->getPositionY() + image2->GetHeight());
 
         return wxRect(leftBound, topBound, rightBound - leftBound, bottomBound - topBound);
     }
 
     wxRect GetInnerBounds(Image *image1, Image *image2)
     {
-        // generate offsets based on marked points
-        wxPoint offsetImage2 = GetRelativeOffset(image1, image2);
-
-        int leftBound = std::max(image1->getPositionX(), offsetImage2.x);
-        int rightBound = std::min(image1->getPositionX() + image1->GetWidth(), offsetImage2.x + image2->GetWidth());
-        int topBound = std::max(image1->getPositionY(), offsetImage2.y);
-        int bottomBound = std::min(image1->getPositionY() + image1->GetHeight(), offsetImage2.y + image2->GetHeight());
+        int leftBound = std::max(image1->getPositionX(), image2->getPositionX());
+        int rightBound = std::min(image1->getPositionX() + image1->GetWidth(), image2->getPositionX() + image2->GetWidth());
+        int topBound = std::max(image1->getPositionY(), image2->getPositionY());
+        int bottomBound = std::min(image1->getPositionY() + image1->GetHeight(), image2->getPositionY() + image2->GetHeight());
 
         return wxRect(leftBound, topBound, rightBound - leftBound, bottomBound - topBound);
     }
