@@ -167,14 +167,15 @@ void Image::ScaleImage(wxStaticBitmap *bitmapDisplay)
 
     m_scaledSize = m_fullSize * m_scale;
 
-    m_position = wxPoint((m_panelSize.x - m_scaledSize.x) / 2, (m_panelSize.y - m_scaledSize.y) / 2);
+    // I changed this to a temp from m_position because it was problematic with reselecting frame1 interest point in animator; this now has issues with aligning in SB after scaling.
+    wxPoint tempPosition = wxPoint((m_panelSize.x - m_scaledSize.x) / 2, (m_panelSize.y - m_scaledSize.y) / 2);
     
     wxImage scaledImage = (*this).Copy();
     scaledImage.Rescale(m_scaledSize.GetWidth(), m_scaledSize.GetHeight(), wxIMAGE_QUALITY_HIGH);
 
     bitmapDisplay->SetBitmap(scaledImage);
     bitmapDisplay->SetSize(m_scaledSize);
-    bitmapDisplay->SetPosition(m_position);
+    bitmapDisplay->SetPosition(tempPosition);
 }
 
 void Image::FitImage(wxStaticBitmap *bitmapDisplay)
