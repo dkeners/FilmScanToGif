@@ -12,7 +12,7 @@ namespace Animator {
     // Sub images
     std::map<wxString, Image> subImages;
 
-    void FrameAlignment(LayoutManager* lManager, Image* image, wxString frameSequenceName)
+    void FrameAlignment(LayoutManager* lManager, Image* image, wxString frameSequenceName, bool reselectFrame1Point)
     {
         // Get the frame sequence
         FrameSequence seq = lManager->getFrameSequence(frameSequenceName);
@@ -29,7 +29,7 @@ namespace Animator {
                 // Get the sub images
                 Image subImage1 = image->CustomSubImage(lManager->getFrame(frameName1));
                 // Set the focal point for the first frame
-                FocalPointDialog focalPointDialog(nullptr, wxString("Set Focal Point"), &subImage1);
+                FocalPointDialog focalPointDialog(nullptr, wxString("Set Focal Point: First Image"), &subImage1);
                 focalPointDialog.ShowModal();
                 alignedFrames.insert(frameName1);
                 subImage1.setPosition(0, 0);
@@ -42,18 +42,25 @@ namespace Animator {
             // Check if the frame is already aligned
             if (alignedFrames.find(frameName2) == alignedFrames.end())
             {
+                // Placing this here avoids clicking the first point if the second isn't even called.
+                Image* image1 = &subImages[frameName1];
+                if (i != 0 && reselectFrame1Point)
+                {
+                    FocalPointDialog focalPointDialog3(nullptr, wxString("Set Focal Point: First Image"), image1);
+                    focalPointDialog3.ShowModal();
+                }
+
                 // Get the sub images
                 Image subImage = image->CustomSubImage(lManager->getFrame(frameName2));
                 
                 // Set focal points
-                FocalPointDialog focalPointDialog(nullptr, wxString("Set Focal Point"), &subImage);
+                FocalPointDialog focalPointDialog(nullptr, wxString("Set Focal Point: Second Image"), &subImage);
                 focalPointDialog.ShowModal();
                 alignedFrames.insert(frameName2);
                 subImage.setPosition(0, 0);
                 subImages[frameName2] = subImage;
 
                 // Combine and align the images
-                Image* image1 = &subImages[frameName1];
                 Image* image2 = &subImages[frameName2];
                 // Immediatly set the position from the offsets
                 ImageCombinator::SetSecondImagePosition(image1, image2);
