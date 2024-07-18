@@ -1,4 +1,5 @@
 #include "animator.h"
+#include "../imagealigndialog.h"
 #include "unordered_set" // std::unordered_set
 #include <wx/wfstream.h>
 #include <wx/anidecod.h> // wxImageArray
@@ -65,9 +66,13 @@ namespace Animator {
                 // Immediatly set the position from the offsets
                 ImageCombinator::SetSecondImagePosition(image1, image2);
                 // Send two images to viewer, where they are displayed and can be adjusted
-                Image combinedImages = ImageCombinator::combineImages(image1, image2);
-                FocalPointDialog focalPointDialog2(nullptr, wxString("Display combined images"), &combinedImages);
-                focalPointDialog2.ShowModal();
+                ImageAlignDialog imageAlignCheck(nullptr, wxString("Image Alignment Preview"), image1, image2);
+                if (imageAlignCheck.ShowModal() != wxID_OK)
+                {
+                    wxMessageBox("Frame alignment canceled.", "Warning", wxICON_WARNING);
+                    return;
+                }
+                
             }
         }
     }
