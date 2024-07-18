@@ -64,11 +64,6 @@ namespace ImageCombinator
 
     void pixelCombine(wxImage *combinedImage, Image *image1, Image *image2)
     {
-        // Set new image2 location based on offset from image1
-        wxPoint offsetImage2 = GetRelativeOffset(image1, image2);
-        image2->setPositionX(image2->getPositionX() + offsetImage2.x);
-        image2->setPositionY(image2->getPositionY() + offsetImage2.y);
-
         // Find top left of images to offset for data manipulation
         wxRect outerBounds = GetOuterBounds(image1, image2);
         wxRect innerBounds = GetInnerBounds(image1, image2);

@@ -53,7 +53,12 @@ namespace Animator {
                 subImages[frameName2] = subImage;
 
                 // Combine and align the images
-                Image combinedImages = ImageCombinator::combineImages(&subImages[frameName1], &subImages[frameName2]);
+                Image* image1 = &subImages[frameName1];
+                Image* image2 = &subImages[frameName2];
+                // Immediatly set the position from the offsets
+                ImageCombinator::SetSecondImagePosition(image1, image2);
+                // Send two images to viewer, where they are displayed and can be adjusted
+                Image combinedImages = ImageCombinator::combineImages(image1, image2);
                 FocalPointDialog focalPointDialog2(nullptr, wxString("Display combined images"), &combinedImages);
                 focalPointDialog2.ShowModal();
             }
