@@ -100,6 +100,53 @@ namespace Animator {
         switch (borderCrop)
         {
         case ImageBorderCrop::OuterEdge:
+            x = INT_MAX;
+            y = INT_MAX;
+            right = 0;
+            bottom = 0;
+
+            // Find the max offset (into negative space) from top and left, and max bottom and right edges
+            for (int i = 0; i < seq.frameCount; i++)
+            {
+                wxString frameName = seq.frames[i];
+                if (checkedFrames.find(frameName) == checkedFrames.end())
+                {
+                    int tempX = 0;
+                    int tempY = 0;
+                    int tempInt = 0;
+                    Image* image = &subImages[frameName];
+                    if ((tempX = image->getPositionX()) < x)
+                    {
+                        x = tempX;
+                    }
+                    if ((tempY = image->getPositionY()) < y)
+                    {
+                        y = tempY;
+                    }
+                    if ((tempInt = tempX + image->getFullWidth()) > right)
+                    {
+                        right = tempInt;
+                    }
+                    if ((tempInt = tempY + image->getFullHeight()) > bottom)
+                    {
+                        bottom = tempInt;
+                    }
+                    checkedFrames.insert(frameName);
+                }
+            };
+
+            // Create new image the size of the maximums, fill with background color, and paste the images in the correct positions
+            for (auto&& frameName : checkedFrames)
+            {
+                Image* image = &subImages[frameName];
+
+                wxImage newImage(right - x, bottom - y);
+                newImage.SetRGB(wxRect(0, 0, right - x, bottom - y), 255, 255, 255);
+                newImage.Paste(*image, (image->getPositionX() - x), (image->getPositionY() - y));
+                
+                croppedImages[frameName] = newImage;
+            }
+
             break;
 
         case ImageBorderCrop::InnerEdge:
