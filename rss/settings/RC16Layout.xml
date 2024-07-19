@@ -48,7 +48,6 @@
         </animationOrder>
 	</animationInfo>
     <frameInfo>
-    <!-- In order of shooting sequence -->
         <frame name="1">
             <x>11</x>
             <y>39</y>
@@ -97,7 +96,6 @@
             <width>157</width>
             <height>156</height>
         </frame>
-        <!-- Second Row -->
         <frame name="9">
             <x>11</x>
             <y>195</y>
