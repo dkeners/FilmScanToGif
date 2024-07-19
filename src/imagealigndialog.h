@@ -29,10 +29,11 @@ private:
     wxStaticBitmap* m_sb = new wxStaticBitmap(this, wxID_ANY, m_combinedImage);
     Image* m_image1;
     Image* m_image2;
+    BlendMode m_blendMode = BlendMode::DIFFERENCE_;
 
     void CombineImages()
     {
-        m_combinedImage = ImageCombinator::combineImages(m_image1, m_image2);
+        m_combinedImage = ImageCombinator::combineImages(m_image1, m_image2, m_blendMode);
         m_combinedImage.setPanelSize(600, 600);
         m_combinedImage.FitImage(m_sb);
         // Have to set this because of how the bitmapDisplay is in sizer.

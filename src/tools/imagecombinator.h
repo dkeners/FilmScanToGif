@@ -21,12 +21,12 @@ enum class BlendMode
 namespace ImageCombinator
 {
     // Methods to call a comparer window with the first and second images
-    Image combineImages(Image *image1, Image *image2);
+    Image combineImages(Image *image1, Image *image2, BlendMode blendMode = BlendMode::NORMAL_);
     wxPoint GetRelativeOffset(Image *image1, Image *image2);
     void SetSecondImagePosition(Image *image1, Image *image2);
     wxRect GetOuterBounds(Image *image1, Image *image2);
     wxRect GetInnerBounds(Image *image1, Image *image2);
-    void pixelCombine(wxImage *combinedImage, Image *image1, Image *image2);
+    void pixelCombine(wxImage *combinedImage, Image *image1, Image *image2, BlendMode blendMode);
     wxColour blendPixel(unsigned char* r1, unsigned char* g1, unsigned char* b1,
                         unsigned char* r2, unsigned char* g2, unsigned char* b2,
                         BlendMode mode);

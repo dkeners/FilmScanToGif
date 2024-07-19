@@ -5,7 +5,7 @@
 
 namespace ImageCombinator
 {
-    Image combineImages(Image *image1, Image *image2)
+    Image combineImages(Image *image1, Image *image2, BlendMode blendMode)
     {
         wxRect outerBounds = GetOuterBounds(image1, image2);
 
@@ -14,7 +14,7 @@ namespace ImageCombinator
         combinedImage.Create(outerBounds.width, outerBounds.height);
 
         // Combine the images
-        pixelCombine(&combinedImage, image1, image2);
+        pixelCombine(&combinedImage, image1, image2, blendMode);
 
         // Modify image data based on new positioning
         return combinedImage;
@@ -56,7 +56,7 @@ namespace ImageCombinator
         return wxRect(leftBound, topBound, rightBound - leftBound, bottomBound - topBound);
     }
 
-    void pixelCombine(wxImage *combinedImage, Image *image1, Image *image2)
+    void pixelCombine(wxImage *combinedImage, Image *image1, Image *image2, BlendMode blendMode)
     {
         // Find top left of images to offset for data manipulation
         wxRect outerBounds = GetOuterBounds(image1, image2);
@@ -131,7 +131,7 @@ namespace ImageCombinator
             wxColour combinedPixel = blendPixel(
                 image1Red, image1Green, image1Blue,
                 image2Red, image2Green, image2Blue,
-                BlendMode::DIFFERENCE_);
+                blendMode);
 
             // Set the combined pixel
             combinedData[i] = combinedPixel.Red();
