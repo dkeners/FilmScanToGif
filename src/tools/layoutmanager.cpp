@@ -191,6 +191,11 @@ wxString LayoutManager::getLayoutName()
     return m_layoutName;
 }
 
+wxArrayString LayoutManager::getLayouts()
+{
+    return m_layouts;
+}
+
 FrameTiming LayoutManager::getFrameTiming(wxString frameTimingName)
 {
     return m_frameTimings[frameTimingName];

@@ -46,6 +46,7 @@ private:
     void OnAbout(wxCommandEvent& event);
 
     LayoutManager layout_manager;
+    std::map<wxString, int> m_layoutIDs;
     CroppedImgWindow *croppedImgWindow;
 
     wxMenuBar *menuBar;
@@ -103,7 +104,14 @@ MyFrame::MyFrame() : wxFrame(NULL, wxID_ANY, "FilmScanMotion")
     menuEdit->Append(wxID_REDO);
 
     wxMenu *menuView = new wxMenu;
-    menuView->Append(ID_Overlay, "&Overlay", "Hide Alignement Overlay", wxITEM_CHECK);
+    wxMenu *submenuLayouts = new wxMenu;
+    for (auto &&layoutName : layout_manager.getLayouts())
+    {
+        m_layoutIDs[layoutName] = wxWindow::NewControlId();
+        submenuLayouts->Append(m_layoutIDs[layoutName], layoutName, "Load layout: " + layoutName);
+    }
+    menuView->AppendSubMenu(submenuLayouts, "&Layouts");
+    menuView->Append(ID_Overlay, "&Layout Overlay", "Toggle Alignement Overlay", wxITEM_CHECK);
 
 
     wxMenu *menuHelp = new wxMenu;
@@ -130,6 +138,17 @@ MyFrame::MyFrame() : wxFrame(NULL, wxID_ANY, "FilmScanMotion")
     Bind(wxEVT_MENU, &MyFrame::OnUndo, this, wxID_UNDO);
     Bind(wxEVT_MENU, &MyFrame::OnRedo, this, wxID_REDO);
     // View menu event bindings
+    for (auto &&layoutName : layout_manager.getLayouts())
+    {
+        Bind(wxEVT_MENU, [this, layoutName](wxCommandEvent& event) {
+                if (layout_manager.loadLayout(layoutName)) {
+                    SetStatusText("Loaded layout: " + layoutName);
+                } else {
+                    wxLogError("Failed to load layout: " + layoutName);
+                }
+            },
+            m_layoutIDs[layoutName]);
+    }
     Bind(wxEVT_MENU, &MyFrame::OnOverlayToggle, this, ID_Overlay);
     // Help menu event bindings
     Bind(wxEVT_MENU, &MyFrame::OnAbout, this, wxID_ABOUT);

@@ -18,6 +18,7 @@ public:
 
     bool loadLayout(wxString layoutName = "default");
     wxString getLayoutName();
+    wxArrayString getLayouts();
 
     FrameTiming getFrameTiming(wxString frameTimingName);
     FrameSequence getFrameSequence(wxString frameSequenceName);
