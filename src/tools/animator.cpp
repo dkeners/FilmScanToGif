@@ -90,6 +90,18 @@ namespace Animator {
         // Get the frame sequence
         FrameSequence seq = lManager->getFrameSequence(frameSequenceName);
 
+        // Check each frame in sequence is aligned
+        for (int i = 0; i < seq.frameCount; i++)
+        {
+            wxString frameName = seq.frames[i];
+            if (subImages.find(frameName) == subImages.end())
+            {
+                // Display an error message
+                wxMessageBox(wxString("Frames in sequence have not been aligned"), wxString("Error"), wxICON_ERROR);
+                return 0;
+            }
+        }
+
         // WX file save dialog
         wxFileDialog saveFileDialog(nullptr, wxString("Save Animation"), wxString(""), wxString(""), wxString("GIF files (*.gif)|*.gif"), wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
         if (saveFileDialog.ShowModal() == wxID_CANCEL)
@@ -224,15 +236,6 @@ namespace Animator {
         {
             // Get the frame name
             wxString frameName = seq.frames[i];
-
-            // Check if the frame is already aligned, if not throw an error
-            if (croppedImages.find(frameName) == croppedImages.end())
-            {
-                // Display an error message
-                wxMessageBox(wxString("Frames in sequence have not been aligned"), wxString("Error"), wxICON_ERROR);
-                return 0;
-            }
-
             // Get the sub image
             wxImage subImage = croppedImages[frameName];
             wxImage quantSubImage;
