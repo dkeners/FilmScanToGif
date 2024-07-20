@@ -13,10 +13,20 @@
  * @brief The Animator namespace contains classes and functions for animating images.
  */
 namespace Animator {
-    enum class ImageBorderCrop {
-        OuterEdge,
-        InnerEdge,
+    /**
+     * @brief The ExportModifier enum class.
+     *
+     * This enum class is used to specify the possible export modifiers for the animation.
+     */   
+    enum class ExportModifier {
+        None = 0,               // 0000
+        Transparent = 1 << 0,   // 0001
+        StackFrames = 1 << 1,   // 0010
+        CropInterior = 1 << 2,  // 0100
     };
+
+    inline ExportModifier operator|(ExportModifier a, ExportModifier b);
+    inline ExportModifier operator&(ExportModifier a, ExportModifier b);
 
     /**
      * @brief Aligns a frame within an animation.
@@ -37,5 +47,5 @@ namespace Animator {
      * @param animationName (Optional) Name of the animation. Defaults to `"default"`.
      * @param borderCrop (Optional) Crop the image border. Defaults to `ImageBorderCrop::InnerEdge`.
      */
-    const int ExportAnimation(LayoutManager* lManager, wxString animationName = "default", ImageBorderCrop borderCrop = ImageBorderCrop::InnerEdge);
+    const int ExportAnimation(LayoutManager* lManager, wxString animationName = "default", ExportModifier modifiers = ExportModifier::None, wxColour bgColor = wxColour(0, 0, 0));
 }

@@ -12,6 +12,14 @@
 namespace Animator {
     // Sub images
     std::map<wxString, Image> subImages;
+    
+    ExportModifier operator|(ExportModifier a, ExportModifier b) {
+        return static_cast<ExportModifier>(static_cast<int>(a) | static_cast<int>(b));
+    }
+
+    ExportModifier operator&(ExportModifier a, ExportModifier b) {
+        return static_cast<ExportModifier>(static_cast<int>(a) & static_cast<int>(b));
+    }
 
     void FrameAlignment(LayoutManager* lManager, Image* image, wxString frameSequenceName, bool reselectFrame1Point)
     {
@@ -77,7 +85,7 @@ namespace Animator {
         }
     }
 
-    const int ExportAnimation(LayoutManager* lManager, wxString frameSequenceName, ImageBorderCrop borderCrop)
+    const int ExportAnimation(LayoutManager* lManager, wxString frameSequenceName, ExportModifier modifiers, wxColour bgColor)
     {
         // Get the frame sequence
         FrameSequence seq = lManager->getFrameSequence(frameSequenceName);
@@ -97,59 +105,9 @@ namespace Animator {
         int y;
         int right;
         int bottom;
-        switch (borderCrop)
+        // Crop the images to the border specifications
+        if ((modifiers & ExportModifier::CropInterior) == ExportModifier::CropInterior)  // Crop to inner edge
         {
-        case ImageBorderCrop::OuterEdge:
-            x = INT_MAX;
-            y = INT_MAX;
-            right = 0;
-            bottom = 0;
-
-            // Find the max offset (into negative space) from top and left, and max bottom and right edges
-            for (int i = 0; i < seq.frameCount; i++)
-            {
-                wxString frameName = seq.frames[i];
-                if (checkedFrames.find(frameName) == checkedFrames.end())
-                {
-                    int tempX = 0;
-                    int tempY = 0;
-                    int tempInt = 0;
-                    Image* image = &subImages[frameName];
-                    if ((tempX = image->getPositionX()) < x)
-                    {
-                        x = tempX;
-                    }
-                    if ((tempY = image->getPositionY()) < y)
-                    {
-                        y = tempY;
-                    }
-                    if ((tempInt = tempX + image->getFullWidth()) > right)
-                    {
-                        right = tempInt;
-                    }
-                    if ((tempInt = tempY + image->getFullHeight()) > bottom)
-                    {
-                        bottom = tempInt;
-                    }
-                    checkedFrames.insert(frameName);
-                }
-            };
-
-            // Create new image the size of the maximums, fill with background color, and paste the images in the correct positions
-            for (auto&& frameName : checkedFrames)
-            {
-                Image* image = &subImages[frameName];
-
-                wxImage newImage(right - x, bottom - y);
-                newImage.SetRGB(wxRect(0, 0, right - x, bottom - y), 255, 255, 255);
-                newImage.Paste(*image, (image->getPositionX() - x), (image->getPositionY() - y));
-                
-                croppedImages[frameName] = newImage;
-            }
-
-            break;
-
-        case ImageBorderCrop::InnerEdge:
             x = 0;
             y = 0;
             right = INT_MAX;
@@ -195,12 +153,64 @@ namespace Animator {
 
                 croppedImages[frameName] = image->GetSubImage(region);
             }
-            
-            break;
-        
-        default:
-            wxFAIL_MSG("Invalid border crop type");
-            break;
+        }
+        else        // Crop to outer edge
+        {
+            x = INT_MAX;
+            y = INT_MAX;
+            right = 0;
+            bottom = 0;
+
+            // Find the max offset (into negative space) from top and left, and max bottom and right edges
+            for (int i = 0; i < seq.frameCount; i++)
+            {
+                wxString frameName = seq.frames[i];
+                if (checkedFrames.find(frameName) == checkedFrames.end())
+                {
+                    int tempX = 0;
+                    int tempY = 0;
+                    int tempInt = 0;
+                    Image* image = &subImages[frameName];
+                    if ((tempX = image->getPositionX()) < x)
+                    {
+                        x = tempX;
+                    }
+                    if ((tempY = image->getPositionY()) < y)
+                    {
+                        y = tempY;
+                    }
+                    if ((tempInt = tempX + image->getFullWidth()) > right)
+                    {
+                        right = tempInt;
+                    }
+                    if ((tempInt = tempY + image->getFullHeight()) > bottom)
+                    {
+                        bottom = tempInt;
+                    }
+                    checkedFrames.insert(frameName);
+                }
+            };
+
+            // Create new image the size of the maximums, fill with background color, and paste the images in the correct positions
+            for (auto&& frameName : checkedFrames)
+            {
+                Image* image = &subImages[frameName];
+
+                wxImage newImage(right - x, bottom - y);
+
+                if ((modifiers & ExportModifier::Transparent) == ExportModifier::Transparent)
+                {
+                    // Set the background color to transparent
+                }
+                else
+                {
+                    newImage.SetRGB(wxRect(0, 0, right - x, bottom - y), bgColor.Red(), bgColor.Green(), bgColor.Blue());
+                }
+
+                newImage.Paste(*image, (image->getPositionX() - x), (image->getPositionY() - y));
+                
+                croppedImages[frameName] = newImage;
+            }
         }
         
         // Create array of images for gif, using quantized imgs
