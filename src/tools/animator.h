@@ -6,7 +6,7 @@
 #include "layoutmanager.h"
 #include "imagecombinator.h"
 #include "../loadedimage.h"
-#include "../focalpointdialog.h"
+#include "../ui/focalpointdialog.h"
 
 /**
  * @namespace Animator

@@ -9,7 +9,7 @@
 #include <stdio.h>
 #include <wx/stdpaths.h>
 
-#include "croppedimgwindow.h"
+#include "ui/croppedimgwindow.h"
 #include "loadedimage.h"
 #include "tools/bitmaptransforms.h"
 #include "tools/layoutmanager.h"

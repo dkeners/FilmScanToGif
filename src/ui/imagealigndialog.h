@@ -4,8 +4,8 @@
 #include <wx/dialog.h>
 #include <wx/statbmp.h>
 
-#include "tools/imagecombinator.h"
-#include "tools/bitmaptransforms.h"
+#include "../tools/imagecombinator.h"
+#include "../tools/bitmaptransforms.h"
 
 class ImageAlignDialog : public wxDialog
 {

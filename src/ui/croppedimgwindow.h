@@ -1,7 +1,7 @@
 #pragma once 
 
 #include <wx/wx.h>
-#include "loadedimage.h"
+#include "../loadedimage.h"
 
 class CroppedImgWindow : public wxFrame
 {

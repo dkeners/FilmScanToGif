@@ -1,5 +1,5 @@
 #include "animator.h"
-#include "../imagealigndialog.h"
+#include "../ui/imagealigndialog.h"
 #include "unordered_set" // std::unordered_set
 #include <wx/wfstream.h>
 #include <wx/anidecod.h> // wxImageArray

@@ -1,6 +1,6 @@
 #include "croppedimgwindow.h"
 
-#include "tools/bitmaptransforms.h"
+#include "../tools/bitmaptransforms.h"
 
 CroppedImgWindow::CroppedImgWindow(wxFrame *parent, wxString title, Image *subImage)
     : wxFrame(parent, wxID_ANY, title)
