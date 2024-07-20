@@ -21,6 +21,11 @@ namespace Animator {
         return static_cast<ExportModifier>(static_cast<int>(a) & static_cast<int>(b));
     }
 
+    ExportModifier& operator|=(ExportModifier& lhs, ExportModifier rhs) {
+        lhs = lhs | rhs;
+        return lhs;
+    }
+
     void FrameAlignment(LayoutManager* lManager, Image* image, wxString frameSequenceName, bool reselectFrame1Point)
     {
         // Get the frame sequence

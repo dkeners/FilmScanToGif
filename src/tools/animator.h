@@ -25,8 +25,9 @@ namespace Animator {
         CropInterior = 1 << 2,  // 0100
     };
 
-    inline ExportModifier operator|(ExportModifier a, ExportModifier b);
-    inline ExportModifier operator&(ExportModifier a, ExportModifier b);
+    ExportModifier operator|(ExportModifier a, ExportModifier b);
+    ExportModifier operator&(ExportModifier a, ExportModifier b);
+    ExportModifier& operator|=(ExportModifier& lhs, ExportModifier rhs);
 
     /**
      * @brief Aligns a frame within an animation.
