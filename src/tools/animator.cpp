@@ -203,6 +203,8 @@ namespace Animator {
                 }
             };
 
+            wxString previousImageName = "";
+
             // Create new image the size of the maximums, fill with background color, and paste the images in the correct positions
             for (auto&& frameName : checkedFrames)
             {
@@ -210,13 +212,26 @@ namespace Animator {
 
                 wxImage newImage(right - x, bottom - y);
 
-                if ((modifiers & ExportModifier::Transparent) == ExportModifier::Transparent)
+                if ((modifiers & ExportModifier::StackFrames) == ExportModifier::StackFrames)  // Stack frames
                 {
-                    // Set the background color to transparent
+                    if (previousImageName != "")
+                    {
+                        newImage = croppedImages[previousImageName].Copy();
+                    }
+                    else
+                    {
+                        newImage.SetRGB(wxRect(0, 0, right - x, bottom - y), bgColor.Red(), bgColor.Green(), bgColor.Blue());
+                    }
+                    previousImageName = frameName;
                 }
-                else
+                else  // single frame, solid background
                 {
                     newImage.SetRGB(wxRect(0, 0, right - x, bottom - y), bgColor.Red(), bgColor.Green(), bgColor.Blue());
+                }
+
+                if ((modifiers & ExportModifier::Transparent) == ExportModifier::Transparent)  // Transparent background
+                {
+                    // Set the background color to transparent
                 }
 
                 newImage.Paste(*image, (image->getPositionX() - x), (image->getPositionY() - y));
