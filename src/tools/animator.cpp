@@ -160,6 +160,14 @@ namespace Animator {
                 }
             };
 
+            // Check if the images all have a common overlap
+            if (x >= right || y >= bottom)
+            {
+                // Display an error message
+                wxMessageBox(wxString("Frames in sequence have no common overlap"), wxString("Error"), wxICON_ERROR);
+                return 0;
+            }
+
             // Crop the images to the found minimums
             for (auto&& frameName : checkedFrames)
             {
