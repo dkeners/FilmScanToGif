@@ -14,6 +14,7 @@
 #include "tools/bitmaptransforms.h"
 #include "tools/layoutmanager.h"
 #include "tools/animator.h"
+#include "ui/exportdialog.h"
 
 class MyApp : public wxApp 
 {
@@ -431,7 +432,8 @@ void MyFrame::OnExport(wxCommandEvent& event)
 {
     SetStatusText("Exporting file...");
 
-    switch (Animator::ExportAnimation(&layout_manager, "default", Animator::ImageBorderCrop::InnerEdge))
+    ExportDialog exportDialog(this, "Export Image", layout_manager);
+    switch (exportDialog.ShowModal())
     {
     case 0:
         SetStatusText("Error exporting file!");
