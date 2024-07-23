@@ -3,6 +3,7 @@ cmake_minimum_required(VERSION 3.14 FATAL_ERROR)
 target_sources(${PROJECT_NAME} PRIVATE
     # ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ui/croppedimgwindow.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/ui/exportdialog.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/loadedimage.cpp
     # ${CMAKE_CURRENT_SOURCE_DIR}/focalpointdialog.h
     ${CMAKE_CURRENT_SOURCE_DIR}/tools/animator.cpp
