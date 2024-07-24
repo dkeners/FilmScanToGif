@@ -11,20 +11,26 @@
     <animationInfo>
 		<frameTiming>
             <default>
-                <time>100</time>
-            </default>
-            <slowFast>
-                <time>150</time>
-                <time>100</time>
-            </slowFast>
-            <slowdown>
-                <time>100</time>
-                <time>125</time>
-                <time>150</time>
-                <time>175</time>
+                <time>300</time>
                 <time>200</time>
-                <time>225</time>
-            </slowdown>
+                <time>200</time>
+                <time>200</time>
+                <time>200</time>
+                <time>100</time>
+                <time>100</time>
+                <time>100</time>
+                <time>100</time>
+                <time>100</time>
+                <time>100</time>
+                <time>100</time>
+                <time>200</time>
+                <time>200</time>
+                <time>300</time>
+                <time>300</time>
+            </default>
+            <fast>
+                <time>100</time>
+            </fast>
         </frameTiming>
         <animationOrder>
             <default totalFrames="16">
