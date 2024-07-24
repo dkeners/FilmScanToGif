@@ -111,18 +111,17 @@ bool LayoutManager::loadLayout(wxString layoutName)
                     {
                         wxString name = frameTiming->GetName();
 
-                        wxArrayInt timings;
+                        std::vector<int> delays;
                         wxXmlNode *timeNode = frameTiming->GetChildren();
                         while (timeNode)
                         {
                             if (timeNode->GetName() == "time") {
-                                timings.Add(wxAtoi(timeNode->GetNodeContent()));
+                                delays.push_back(wxAtoi(timeNode->GetNodeContent()));
                             }
                             timeNode = timeNode->GetNext();
                         }
 
-                        FrameTiming timing = {timings};
-                        m_frameTimings[name] = timing;
+                        m_frameTimings[name] = delays;
 
                         frameTiming = frameTiming->GetNext();
                     }
@@ -196,7 +195,7 @@ wxArrayString LayoutManager::getLayouts()
     return m_layouts;
 }
 
-FrameTiming LayoutManager::getFrameTiming(wxString frameTimingName)
+std::vector<int> LayoutManager::getFrameTiming(wxString frameTimingName)
 {
     return m_frameTimings[frameTimingName];
 }

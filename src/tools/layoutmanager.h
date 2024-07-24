@@ -20,7 +20,7 @@ public:
     wxString getLayoutName();
     wxArrayString getLayouts();
 
-    FrameTiming getFrameTiming(wxString frameTimingName);
+    std::vector<int> getFrameTiming(wxString frameTimingName);
     FrameSequence getFrameSequence(wxString frameSequenceName);
 
     int getFrameCount();

@@ -4,8 +4,4 @@
 
 #include <wx/wx.h>
 
-struct FrameTiming {
-    wxArrayInt timings;
-};
-
-using FrameTimingMap = std::map<wxString, FrameTiming>;
+using FrameTimingMap = std::map<wxString, std::vector<int>>;
