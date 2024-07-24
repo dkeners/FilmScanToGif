@@ -87,12 +87,13 @@ public:
     bool loadRotateControls(wxWindow *parent, wxStaticBitmap *bitmapDisplay);
 
     /**
-     * @brief Creates a control sizer.
+     * @brief Creates a control sizer. Aesthetically, add a RHS padding to any elements added to this sizer after creation.
      * 
+     * @param parent The parent window where the controls will be loaded.
      * @param padding The padding value for the sizer.
      * @return The created wxBoxSizer object.
      */
-    wxBoxSizer *createControlSizer(int padding = 5);
+    wxBoxSizer *createControlSizer(wxWindow* parent, int padding = 5);
 
 private:
     wxWindow *parent_; // The parent window

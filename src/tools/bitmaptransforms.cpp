@@ -74,9 +74,10 @@ bool BitmapTransforms::loadRotateControls(wxWindow *parent, wxStaticBitmap *bitm
     return loadedRotateControls_ = true;
 }
 
-wxBoxSizer *BitmapTransforms::createControlSizer(int padding)
+wxBoxSizer *BitmapTransforms::createControlSizer(wxWindow* parent, int padding)
 {
-    wxBoxSizer *sizer = new wxBoxSizer(wxHORIZONTAL);
+    wxStaticBoxSizer* sizer = new wxStaticBoxSizer(wxHORIZONTAL, parent, "Image Controls");
+    sizer->AddSpacer(padding);
     if (loadedZoomControls_)
     {
         sizer->Add(button_zoom, 0, wxALIGN_CENTER_VERTICAL | wxRIGHT | wxTOP | wxBOTTOM, padding);

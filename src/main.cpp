@@ -202,9 +202,9 @@ MyFrame::MyFrame() : wxFrame(NULL, wxID_ANY, "FilmScanMotion")
     button_upload_image->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &MyFrame::OnImport, this);
 
     // Button Controls Sizer
-    wxBoxSizer *sizer_image_controls = controls_.createControlSizer();
+    wxBoxSizer *sizer_image_controls = controls_.createControlSizer(this);
 
-    sizer_image_controls->Add(button_upload_image, 0, wxALIGN_CENTER_VERTICAL | wxTOP | wxBOTTOM, 5);
+    sizer_image_controls->Add(button_upload_image, 0, wxALIGN_CENTER_VERTICAL | wxTOP | wxBOTTOM | wxRIGHT, 5);
     // END BUTTON CONTROLS
 
     // IMAGE SELECTOR CONTROLS
