@@ -274,7 +274,8 @@ namespace Animator {
         }
 
         wxGIFHandler gifHandler;
-        if (gifHandler.SaveAnimation(imgArray, &output)) {
+        std::vector<int> frameDelays = lManager->getFrameTiming(frameSequenceName);
+        if (gifHandler.SaveAnimation(imgArray, &output, true, frameDelays)) {
             return 1;
         } else {
             return 0;
