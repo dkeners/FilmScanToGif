@@ -244,7 +244,28 @@ namespace Animator {
 
                 if ((modifiers & ExportModifier::Transparent) == ExportModifier::Transparent)  // Transparent background
                 {
-                    // Set the background color to transparent
+                    int imageLeftBound = image->getPositionX();
+                    int imageTopBound = image->getPositionY();
+                    int imageRightBound = imageLeftBound + image->getFullWidth();
+                    int imageBottomBound = imageTopBound + image->getFullHeight();
+
+                    unsigned char* alphaData = (unsigned char*)malloc(newImage.GetWidth() * newImage.GetHeight());
+
+                    for (int i = 0; i < newImage.GetWidth() * newImage.GetHeight(); i++)
+                    {
+                        int x = i % newImage.GetWidth();
+                        int y = i / newImage.GetWidth();
+                        if (x >= imageLeftBound && x < imageRightBound && y >= imageTopBound && y < imageBottomBound)
+                        {
+                            alphaData[i] = 255;
+                        }
+                        else
+                        {
+                            alphaData[i] = 0;
+                        }
+                    }
+
+                    newImage.SetAlpha(alphaData);
                 }
 
                 newImage.Paste(*image, (image->getPositionX() - x), (image->getPositionY() - y));
