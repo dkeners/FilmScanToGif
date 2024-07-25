@@ -8,6 +8,7 @@
 #include <wx/filename.h>
 #include <stdio.h>
 #include <wx/stdpaths.h>
+#include <wx/combobox.h>
 
 #include "ui/croppedimgwindow.h"
 #include "loadedimage.h"
@@ -55,6 +56,9 @@ private:
     wxFileName m_filepath;
     wxFileName m_imagepath;
     Image image;
+
+    wxComboBox* m_combo_frame_sequence;
+    wxComboBox* m_combo_frame_timing;
 
     wxStaticBitmap *m_static_bitmap;
     wxBitmap m_source_bitmap;
@@ -144,6 +148,12 @@ MyFrame::MyFrame() : wxFrame(NULL, wxID_ANY, "FilmScanMotion")
         Bind(wxEVT_MENU, [this, layoutName](wxCommandEvent& event) {
                 if (layout_manager.loadLayout(layoutName)) {
                     SetStatusText("Loaded layout: " + layoutName);
+                    m_combo_frame_sequence->Set(layout_manager.getFrameSequenceNames());
+                    m_combo_frame_sequence->Append("custom");
+                    m_combo_frame_sequence->SetSelection(0);
+                    m_combo_frame_timing->Set(layout_manager.getFrameTimingNames());
+                    m_combo_frame_timing->Append("custom");
+                    m_combo_frame_timing->SetSelection(0);
                 } else {
                     wxLogError("Failed to load layout: " + layoutName);
                 }
@@ -200,11 +210,6 @@ MyFrame::MyFrame() : wxFrame(NULL, wxID_ANY, "FilmScanMotion")
     // Import Image
     wxButton *button_upload_image = new wxButton(this, wxID_ANY, "Upload Image", wxDefaultPosition, wxSize(100, 40));
     button_upload_image->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &MyFrame::OnImport, this);
-
-    // Button Controls Sizer
-    wxBoxSizer *sizer_image_controls = controls_.createControlSizer(this);
-
-    sizer_image_controls->Add(button_upload_image, 0, wxALIGN_CENTER_VERTICAL | wxTOP | wxBOTTOM | wxRIGHT, 5);
     // END BUTTON CONTROLS
 
     // IMAGE SELECTOR CONTROLS
@@ -226,9 +231,26 @@ MyFrame::MyFrame() : wxFrame(NULL, wxID_ANY, "FilmScanMotion")
     // END IMAGE SELECTOR CONTROLS
 
     // ANIMATION CONTROLS
-    wxBoxSizer *sizer_animation_controls = new wxBoxSizer(wxHORIZONTAL);
-    wxButton *button_play = new wxButton(this, wxID_ANY, "Set Image Alignments", wxDefaultPosition, wxSize(100, 40));
-    button_play->Bind(wxEVT_COMMAND_BUTTON_CLICKED, [this](wxCommandEvent& event) {
+    // ComboBox for Possible Frame Sequences
+    m_combo_frame_sequence = new wxComboBox(this, wxID_ANY, "default", wxDefaultPosition, wxDefaultSize, layout_manager.getFrameSequenceNames(), wxCB_READONLY);
+    m_combo_frame_sequence->Bind(wxEVT_COMBOBOX, [this](wxCommandEvent& event) {
+        wxString selectedSequence = m_combo_frame_sequence->GetValue();
+        this->SetStatusText("Selected Frame Sequence: " + selectedSequence);
+        });
+    m_combo_frame_sequence->Append("custom");
+    // ComboBox for Possible Frame Timings
+    m_combo_frame_timing = new wxComboBox(this, wxID_ANY, "default", wxDefaultPosition, wxDefaultSize, layout_manager.getFrameTimingNames(), wxCB_READONLY);
+    m_combo_frame_timing->Bind(wxEVT_COMBOBOX, [this](wxCommandEvent& event) {
+        wxString selectedTiming = m_combo_frame_timing->GetValue();
+        this->SetStatusText("Selected Frame Timing: " + selectedTiming);
+        });
+    m_combo_frame_timing->Append("custom");
+    // Checkbox for Variable Focus Point
+    wxCheckBox* checkbox_stationary_focus = new wxCheckBox(this, wxID_ANY, "Stationary Focus Point?");
+    checkbox_stationary_focus->SetValue(true);
+    // Button to Align Frames
+    wxButton* button_align_anim = new wxButton(this, wxID_ANY, "Align - Single", wxDefaultPosition, wxSize(100, 40));
+    button_align_anim->Bind(wxEVT_COMMAND_BUTTON_CLICKED, [this, checkbox_stationary_focus](wxCommandEvent& event) {
         if (!image.IsOk()) {
             wxLogError("No image loaded!");
             return;
@@ -238,17 +260,34 @@ MyFrame::MyFrame() : wxFrame(NULL, wxID_ANY, "FilmScanMotion")
             return;
         }
 
-        Animator::FrameAlignment(&layout_manager, &image);
+        Animator::FrameAlignment(&layout_manager, &image, m_combo_frame_sequence->GetValue(), checkbox_stationary_focus->IsChecked());
 
         });
-    sizer_animation_controls->Add(button_play, 0, wxALIGN_CENTER_VERTICAL | wxTOP | wxBOTTOM, 5);
+    // Button to Export Animation
+    wxButton* button_export_anim = new wxButton(this, wxID_ANY, "Export\nAnimation", wxDefaultPosition, wxSize(100, 40));
+    button_export_anim->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &MyFrame::OnExport, this);
+    // END ANIMATION CONTROLS
 
+    // MAIN SIZER
     wxBoxSizer *sizer = new wxBoxSizer(wxVERTICAL);
-    sizer->Add(panel_image, 0, wxEXPAND | wxALL, 10);
-    sizer->Add(sizer_image_controls, 0, wxEXPAND | wxLEFT | wxRIGHT | wxBOTTOM, 10);
-    sizer->Add(sizer_image_selector, 0, wxEXPAND | wxLEFT | wxRIGHT | wxBOTTOM, 10);
-    sizer->Add(sizer_animation_controls, 0, wxEXPAND | wxLEFT | wxRIGHT | wxBOTTOM, 10);
+        sizer->Add(panel_image, 0, wxEXPAND | wxALL, 10);
+        
+        // Button Controls Sizer
+        wxBoxSizer *sizer_image_controls = controls_.createControlSizer(this);
+            sizer_image_controls->Add(button_upload_image, 0, wxALIGN_CENTER_VERTICAL | wxTOP | wxBOTTOM | wxRIGHT, 5);
+        sizer->Add(sizer_image_controls, 0, wxEXPAND | wxLEFT | wxRIGHT | wxBOTTOM, 10);
+        
+        sizer->Add(sizer_image_selector, 0, wxEXPAND | wxLEFT | wxRIGHT | wxBOTTOM, 10);
 
+        // Animation Controls Sizer
+        wxStaticBoxSizer* sizer_animation_controls = new wxStaticBoxSizer(wxHORIZONTAL, this, "Animation Controls");
+            sizer_animation_controls->Add(m_combo_frame_sequence, 0, wxALIGN_CENTER_VERTICAL | wxALL, 5);
+            sizer_animation_controls->Add(m_combo_frame_timing, 0, wxALIGN_CENTER_VERTICAL | wxTOP | wxBOTTOM, 5);
+            sizer_animation_controls->AddStretchSpacer();
+            sizer_animation_controls->Add(checkbox_stationary_focus, 0, wxALIGN_CENTER_VERTICAL | wxALL, 5);
+            sizer_animation_controls->Add(button_align_anim, 0, wxALIGN_CENTER_VERTICAL | wxTOP | wxBOTTOM, 5);
+            sizer_animation_controls->Add(button_export_anim, 0, wxALIGN_CENTER_VERTICAL | wxALL, 5);
+        sizer->Add(sizer_animation_controls, 0, wxEXPAND | wxLEFT | wxRIGHT | wxBOTTOM, 10);
     this->SetSizerAndFit(sizer);
 }
 
