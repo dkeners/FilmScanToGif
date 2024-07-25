@@ -195,9 +195,29 @@ wxArrayString LayoutManager::getLayouts()
     return m_layouts;
 }
 
+wxArrayString LayoutManager::getFrameTimingNames()
+{
+    wxArrayString names;
+    for (auto const& [key, val] : m_frameTimings)
+    {
+        names.Add(key);
+    }
+    return names;
+}
+
 std::vector<int> LayoutManager::getFrameTiming(wxString frameTimingName)
 {
     return m_frameTimings[frameTimingName];
+}
+
+wxArrayString LayoutManager::getFrameSequenceNames()
+{
+    wxArrayString names;
+    for (auto const& [key, val] : m_frameSequences)
+    {
+        names.Add(key);
+    }
+    return names;
 }
 
 FrameSequence LayoutManager::getFrameSequence(wxString frameSequenceName)
