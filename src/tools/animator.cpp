@@ -286,10 +286,31 @@ namespace Animator {
             // Get the frame name
             wxString frameName = seq.frames[i];
             // Get the sub image
-            wxImage subImage = croppedImages[frameName];
-            wxImage quantSubImage;
+            // wxImage subImage = croppedImages[frameName];
+            // wxImage quantSubImage;
             // quantize the subImage
-            wxQuantize::Quantize(subImage, quantSubImage);
+            wxImage quantSubImage = croppedImages[frameName].Copy();
+            wxQuantize::Quantize(quantSubImage, quantSubImage);
+
+            if (quantSubImage.HasAlpha())
+            {
+                quantSubImage.ConvertAlphaToMask();
+            }
+            // // If transparent, move transparency to the quantized image
+            // if ((modifiers & ExportModifier::Transparent) == ExportModifier::Transparent)
+            // {
+            //     unsigned char* originalAlpha = subImage.GetAlpha();
+            //     unsigned char* newAlpha = (unsigned char*)malloc(subImage.GetWidth() * subImage.GetHeight());
+
+            //     memcpy(newAlpha, originalAlpha, subImage.GetWidth() * subImage.GetHeight());
+
+            //     quantSubImage.SetAlpha(newAlpha);
+            //     quantSubImage.ConvertAlphaToMask();
+            //     free(newAlpha);
+            // }
+            // Save image to file
+            int palattecount = quantSubImage.GetPalette().GetColoursCount();
+            quantSubImage.SaveFile("D:\\Downloads - HDD\\contadopierde_danforth-portra-160-3877_2024-02-25_1435\\DANFORTH PORTRA 160 3877\\Transparent Test tRUE" + frameName + ".png", wxBITMAP_TYPE_PNG);
             // Add the image to the array
             imgArray.Add(quantSubImage);
         }
