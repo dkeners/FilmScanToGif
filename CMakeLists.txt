@@ -26,13 +26,12 @@ set(ENTRY src/main.cpp)
 set(RESOURCE_FILES
     rss/settings/layouts.xml
     rss/settings/Nimslo3DLayout.xml
-    rss/settings/Nimslo3DLayout.png)
+    rss/settings/Nimslo3DLayout.png
+    rss/settings/RC16Layout.xml)
 
 if(APPLE)
     # create bundle on apple compiles
     add_executable(${PROJECT_NAME} MACOSX_BUNDLE ${ENTRY} ${RESOURCE_FILES})
-
-    # target_link_libraries(${PROJECT_NAME} PRIVATE wxcore wxnet wxxml heymath mul)
 
     # Set a custom plist file for the app bundle - needed for Mac OS Retina display
     set_target_properties(${PROJECT_NAME} PROPERTIES 
@@ -40,7 +39,6 @@ if(APPLE)
         MACOSX_BUNDLE_BUNDLE_NAME ${PROJECT_NAME}
         MACOSX_BUNDLE_GUI_IDENTIFIER "com.dkeners.${PROJECT_NAME}"
         MACOSX_BUNDLE_INFO_PLIST ${CMAKE_CURRENT_SOURCE_DIR}/Info.plist
-        # RESOURCE "${RESOURCE_FILES}"
         )
 
     set_source_files_properties(${RESOURCE_FILES} 
