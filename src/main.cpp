@@ -8,7 +8,6 @@
 #include <wx/filename.h>
 #include <stdio.h>
 #include <wx/stdpaths.h>
-#include <wx/combobox.h>
 
 #include "ui/croppedimgwindow.h"
 #include "loadedimage.h"
@@ -16,6 +15,7 @@
 #include "tools/layoutmanager.h"
 #include "tools/animator.h"
 #include "ui/exportdialog.h"
+#include "ui/animationcontrols.h"
 
 class MyApp : public wxApp 
 {
@@ -57,8 +57,7 @@ private:
     wxFileName m_imagepath;
     Image image;
 
-    wxComboBox* m_combo_frame_sequence;
-    wxComboBox* m_combo_frame_timing;
+    AnimationControls m_animation_controls = AnimationControls(this, &layout_manager);
 
     wxStaticBitmap *m_static_bitmap;
     wxBitmap m_source_bitmap;
@@ -148,12 +147,7 @@ MyFrame::MyFrame() : wxFrame(NULL, wxID_ANY, "FilmScanMotion")
         Bind(wxEVT_MENU, [this, layoutName](wxCommandEvent& event) {
                 if (layout_manager.loadLayout(layoutName)) {
                     SetStatusText("Loaded layout: " + layoutName);
-                    m_combo_frame_sequence->Set(layout_manager.getFrameSequenceNames());
-                    m_combo_frame_sequence->Append("custom");
-                    m_combo_frame_sequence->SetSelection(0);
-                    m_combo_frame_timing->Set(layout_manager.getFrameTimingNames());
-                    m_combo_frame_timing->Append("custom");
-                    m_combo_frame_timing->SetSelection(0);
+                    m_animation_controls.UpdateControls();
                 } else {
                     wxLogError("Failed to load layout: " + layoutName);
                 }
@@ -231,26 +225,10 @@ MyFrame::MyFrame() : wxFrame(NULL, wxID_ANY, "FilmScanMotion")
     // END IMAGE SELECTOR CONTROLS
 
     // ANIMATION CONTROLS
-    // ComboBox for Possible Frame Sequences
-    m_combo_frame_sequence = new wxComboBox(this, wxID_ANY, "default", wxDefaultPosition, wxDefaultSize, layout_manager.getFrameSequenceNames(), wxCB_READONLY);
-    m_combo_frame_sequence->Bind(wxEVT_COMBOBOX, [this](wxCommandEvent& event) {
-        wxString selectedSequence = m_combo_frame_sequence->GetValue();
-        this->SetStatusText("Selected Frame Sequence: " + selectedSequence);
-        });
-    m_combo_frame_sequence->Append("custom");
-    // ComboBox for Possible Frame Timings
-    m_combo_frame_timing = new wxComboBox(this, wxID_ANY, "default", wxDefaultPosition, wxDefaultSize, layout_manager.getFrameTimingNames(), wxCB_READONLY);
-    m_combo_frame_timing->Bind(wxEVT_COMBOBOX, [this](wxCommandEvent& event) {
-        wxString selectedTiming = m_combo_frame_timing->GetValue();
-        this->SetStatusText("Selected Frame Timing: " + selectedTiming);
-        });
-    m_combo_frame_timing->Append("custom");
-    // Checkbox for Variable Focus Point
-    wxCheckBox* checkbox_stationary_focus = new wxCheckBox(this, wxID_ANY, "Stationary Focus Point?");
-    checkbox_stationary_focus->SetValue(true);
+    m_animation_controls.CreateControls();
     // Button to Align Frames
     wxButton* button_align_anim = new wxButton(this, wxID_ANY, "Align - Single", wxDefaultPosition, wxSize(100, 40));
-    button_align_anim->Bind(wxEVT_COMMAND_BUTTON_CLICKED, [this, checkbox_stationary_focus](wxCommandEvent& event) {
+    button_align_anim->Bind(wxEVT_COMMAND_BUTTON_CLICKED, [this](wxCommandEvent& event) {
         if (!image.IsOk()) {
             wxLogError("No image loaded!");
             return;
@@ -260,7 +238,7 @@ MyFrame::MyFrame() : wxFrame(NULL, wxID_ANY, "FilmScanMotion")
             return;
         }
 
-        Animator::FrameAlignment(&layout_manager, &image, m_combo_frame_sequence->GetValue(), checkbox_stationary_focus->IsChecked());
+        Animator::FrameAlignment(&layout_manager, &image, m_animation_controls.GetSelectedFrameSequence(), m_animation_controls.IsSingleFocusChecked());
 
         });
     // Button to Export Animation
@@ -280,11 +258,7 @@ MyFrame::MyFrame() : wxFrame(NULL, wxID_ANY, "FilmScanMotion")
         sizer->Add(sizer_image_selector, 0, wxEXPAND | wxLEFT | wxRIGHT | wxBOTTOM, 10);
 
         // Animation Controls Sizer
-        wxStaticBoxSizer* sizer_animation_controls = new wxStaticBoxSizer(wxHORIZONTAL, this, "Animation Controls");
-            sizer_animation_controls->Add(m_combo_frame_sequence, 0, wxALIGN_CENTER_VERTICAL | wxALL, 5);
-            sizer_animation_controls->Add(m_combo_frame_timing, 0, wxALIGN_CENTER_VERTICAL | wxTOP | wxBOTTOM, 5);
-            sizer_animation_controls->AddStretchSpacer();
-            sizer_animation_controls->Add(checkbox_stationary_focus, 0, wxALIGN_CENTER_VERTICAL | wxALL, 5);
+        wxStaticBoxSizer* sizer_animation_controls = m_animation_controls.getSizer();
             sizer_animation_controls->Add(button_align_anim, 0, wxALIGN_CENTER_VERTICAL | wxTOP | wxBOTTOM, 5);
             sizer_animation_controls->Add(button_export_anim, 0, wxALIGN_CENTER_VERTICAL | wxALL, 5);
         sizer->Add(sizer_animation_controls, 0, wxEXPAND | wxLEFT | wxRIGHT | wxBOTTOM, 10);
