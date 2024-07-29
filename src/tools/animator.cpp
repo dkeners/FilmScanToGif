@@ -30,13 +30,18 @@ namespace Animator {
     {
         // Get the frame sequence
         FrameSequence seq = lManager->getFrameSequence(frameSequenceName);
+        FrameAlignment(lManager, image, seq.frames, reselectFrame1Point);
+    }
+
+    void FrameAlignment(LayoutManager* lManager, Image* image, wxArrayString frameSequence, bool reselectFrame1Point)
+    {
         // Add list of aligned frames
         std::unordered_set<wxString> alignedFrames;
         // Compare the frames; 1 to 2, 2 to 3, 3 to 4, etc.
-        for (int i = 0; i < seq.frameCount - 1; i++)
+        for (int i = 0; i < frameSequence.GetCount() - 1; i++)
         {
             // Get the first frame name
-            wxString frameName1 = seq.frames[i];
+            wxString frameName1 = frameSequence[i];
 
             if (i == 0)
             {
@@ -51,7 +56,7 @@ namespace Animator {
             }
 
             // Get the frame name
-            wxString frameName2 = seq.frames[i + 1];
+            wxString frameName2 = frameSequence[i + 1];
 
             // Check if the frame is already aligned
             if (alignedFrames.find(frameName2) == alignedFrames.end())

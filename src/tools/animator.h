@@ -40,6 +40,8 @@ namespace Animator {
      * @param reselectFrame1Point (Optional) Creates an extra dialog to change the focal point of the first image; good if the old point is not visible in the new image. Defaults to `false`.
      */
     void FrameAlignment(LayoutManager* lManager, Image* image, wxString animationName = "default", bool reselectFrame1Point = false);
+
+    void FrameAlignment(LayoutManager* lManager, Image* image, wxArrayString frameSequence, bool reselectFrame1Point = false);
     
     /**
      * @brief Exports the animation using the specified layout manager.
