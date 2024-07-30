@@ -6,14 +6,16 @@
 #include <wx/statline.h>
 
 #include "../tools/animator.h"
+#include "animationcontrols.h"
 
 class ExportDialog : public wxDialog
 {
 public:
-    ExportDialog(wxWindow* parent, const wxString& title, LayoutManager& layout_manager);
+    ExportDialog(wxWindow* parent, const wxString& title, LayoutManager& layout_manager, AnimationData animationData);
 
 private:
     LayoutManager& m_layout_manager;
+    AnimationData m_animationData;
 
     wxCheckBox* m_cbTransparent;
     wxCheckBox* m_cbStackFrames;

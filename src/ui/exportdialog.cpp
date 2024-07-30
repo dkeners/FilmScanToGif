@@ -1,7 +1,7 @@
 #include "exportdialog.h"
 
-ExportDialog::ExportDialog(wxWindow* parent, const wxString& title, LayoutManager& layout_manager)
-    : wxDialog(parent, wxID_ANY, title), m_layout_manager(layout_manager)
+ExportDialog::ExportDialog(wxWindow* parent, const wxString& title, LayoutManager& layout_manager, AnimationData animationData)
+    : wxDialog(parent, wxID_ANY, title), m_layout_manager(layout_manager), m_animationData(animationData)
 {
     // Create a wxStaticText to display the export options
     wxStaticText* stTitle = new wxStaticText(this, wxID_ANY, "Export options:");
@@ -93,13 +93,13 @@ void ExportDialog::OnExport(wxCommandEvent& event)
     {
         modifiers = modifiers | Animator::ExportModifier::Transparent;
         // Export the animation...
-        EndModal(Animator::ExportAnimation(&m_layout_manager, "default", modifiers));
+        EndModal(Animator::ExportAnimation(&m_layout_manager, m_animationData, modifiers));
     }
     else
     {
         wxColor color = wxColour(wxAtoi(m_tcRed->GetValue()), wxAtoi(m_tcGreen->GetValue()), wxAtoi(m_tcBlue->GetValue()));
         // Export the animation...
-        EndModal(Animator::ExportAnimation(&m_layout_manager, "default", modifiers, color));
+        EndModal(Animator::ExportAnimation(&m_layout_manager, m_animationData, modifiers, color));
     }
 }
 

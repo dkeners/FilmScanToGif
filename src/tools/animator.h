@@ -7,6 +7,7 @@
 #include "imagecombinator.h"
 #include "../loadedimage.h"
 #include "../ui/focalpointdialog.h"
+#include "../ui/animationcontrols.h"
 
 /**
  * @namespace Animator
@@ -51,4 +52,6 @@ namespace Animator {
      * @param borderCrop (Optional) Crop the image border. Defaults to `ImageBorderCrop::InnerEdge`.
      */
     const int ExportAnimation(LayoutManager* lManager, wxString animationName = "default", ExportModifier modifiers = ExportModifier::None, wxColour bgColor = wxColour(0, 0, 0));
+
+    const int ExportAnimation(LayoutManager* lManager, AnimationData animationData, ExportModifier modifiers = ExportModifier::None, wxColour bgColor = wxColour(0, 0, 0));
 }

@@ -445,7 +445,7 @@ void MyFrame::OnExport(wxCommandEvent& event)
 {
     SetStatusText("Exporting file...");
 
-    ExportDialog exportDialog(this, "Export Image", layout_manager);
+    ExportDialog exportDialog(this, "Export Image", layout_manager, m_animation_controls.GetAnimationData());
     switch (exportDialog.ShowModal())
     {
     case 0:

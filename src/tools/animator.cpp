@@ -98,12 +98,20 @@ namespace Animator {
     const int ExportAnimation(LayoutManager* lManager, wxString frameSequenceName, ExportModifier modifiers, wxColour bgColor)
     {
         // Get the frame sequence
+        AnimationData animationData;
         FrameSequence seq = lManager->getFrameSequence(frameSequenceName);
+        animationData.frameCount = seq.frames.GetCount();
+        animationData.frameSequence = seq.frames;
+        animationData.frameTiming = lManager->getFrameTiming(frameSequenceName);
+        return ExportAnimation(lManager, animationData, modifiers, bgColor);
+    }
 
+    const int ExportAnimation(LayoutManager* lManager, AnimationData animationData, ExportModifier modifiers, wxColour bgColor)
+    {
         // Check each frame in sequence is aligned
-        for (int i = 0; i < seq.frameCount; i++)
+        for (int i = 0; i < animationData.frameCount; i++)
         {
-            wxString frameName = seq.frames[i];
+            wxString frameName = animationData.frameSequence[i];
             if (subImages.find(frameName) == subImages.end())
             {
                 // Display an error message
@@ -136,9 +144,9 @@ namespace Animator {
             bottom = INT_MAX;
 
             // Find the max offset from top and left, and shortest bottom and right edges
-            for (int i = 0; i < seq.frameCount; i++)
+            for (int i = 0; i < animationData.frameCount; i++)
             {
-                wxString frameName = seq.frames[i];
+                wxString frameName = animationData.frameSequence[i];
                 if (checkedFrames.find(frameName) == checkedFrames.end())
                 {
                     int tempX = 0;
@@ -192,9 +200,9 @@ namespace Animator {
             bottom = 0;
 
             // Find the max offset (into negative space) from top and left, and max bottom and right edges
-            for (int i = 0; i < seq.frameCount; i++)
+            for (int i = 0; i < animationData.frameCount; i++)
             {
-                wxString frameName = seq.frames[i];
+                wxString frameName = animationData.frameSequence[i];
                 if (checkedFrames.find(frameName) == checkedFrames.end())
                 {
                     int tempX = 0;
@@ -283,13 +291,13 @@ namespace Animator {
         // new frame sequence
         wxImageArray imgArray;
         imgArray.Clear();
-        imgArray.Alloc(seq.frameCount);
+        imgArray.Alloc(animationData.frameCount);
         // Check if frames in sequence have been aligned
         // Currently this is wastful as each frame must be "quanted" and saved, including if it repeats. It would be better to store pointers maybe and then if the frame is already saved, just add the pointer to the array again
-        for (int i = 0; i < seq.frameCount; i++)
+        for (int i = 0; i < animationData.frameCount; i++)
         {
             // Get the frame name
-            wxString frameName = seq.frames[i];
+            wxString frameName = animationData.frameSequence[i];
             // Get the sub image
             // wxImage subImage = croppedImages[frameName];
             // wxImage quantSubImage;
@@ -321,8 +329,7 @@ namespace Animator {
         }
 
         wxGIFHandler gifHandler;
-        std::vector<int> frameDelays = lManager->getFrameTiming(frameSequenceName);
-        if (gifHandler.SaveAnimation(imgArray, &output, true, frameDelays)) {
+        if (gifHandler.SaveAnimation(imgArray, &output, true, animationData.frameTiming)) {
             return 1;
         } else {
             return 0;
