@@ -3,9 +3,17 @@
 #include <wx/wx.h>
 #include <wx/combobox.h>
 #include <wx/listctrl.h>
+#include <wx/tokenzr.h>
 
 #include "../tools/layoutmanager.h"
 #include "../tools/animator.h"
+
+struct AnimationData
+{
+    int frameCount;
+    wxArrayString frameSequence;
+    std::vector<int> frameTiming;
+};
 
 class AnimationControls
 {
@@ -37,7 +45,20 @@ public:
      * @return A `wxArrayString` containing the selected frame sequence.
      */
     wxArrayString GetSelectedFrameSequence();
+    /**
+     * Retrieves the selected frame timing.
+     *
+     * @param frameCount The number of frames to retrieve the timing for. Defaults to `-1` which calls `GetSelectedFrameSequence().GetCount()`. 
+     * @return A `std::vector<int>` containing the selected frame timing.
+     */
+    std::vector<int> GetSelectedFrameTiming(int frameCount = -1);
 
+    /**
+     * @brief Returns the animation data.
+     * 
+     * @return The `AnimationData` struct containing the animation data.
+     */
+    inline AnimationData GetAnimationData() { return m_animationData; }
     /**
      * @brief Returns the wxStaticBoxSizer associated with the animation controls.
      * 
@@ -94,6 +115,7 @@ private:
      * @note This function should be called whenever there is a change in frame or sequence orders.
      */
     void UpdateAnimationTable();
+    wxArrayString ParseCustomFrameSequence(wxString customSequence);
     /**
      * @brief Propogates the frame timing to the specified number of frames.
      *
@@ -111,10 +133,14 @@ private:
     wxStaticBoxSizer* sizer_main;
 
     wxComboBox* m_combo_frame_sequence;
+    wxTextCtrl* m_text_frame_sequence_custom;
     wxComboBox* m_combo_frame_timing;
+    wxTextCtrl* m_text_frame_timing_custom;
 
     wxListView* m_listview_animation;
     bool m_listview_generated = false;
 
     wxCheckBox* m_checkbox_single_focus;
+
+    AnimationData m_animationData;
 };

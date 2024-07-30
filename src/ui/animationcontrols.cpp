@@ -18,21 +18,31 @@ void AnimationControls::CreateControls()
     m_combo_frame_sequence->Bind(wxEVT_COMBOBOX, [this](wxCommandEvent& event) {
         wxString selectedSequence = m_combo_frame_sequence->GetValue();
         UpdateAnimationTable();
+        m_text_frame_sequence_custom->Enable(selectedSequence == "custom");  // Enable if custom sequence is selected
         m_parent->SetStatusText("Selected Frame Sequence: " + selectedSequence);
         });
     m_combo_frame_sequence->Append("custom");
     // TextControl for Custom Frame Sequence
-    wxTextCtrl* text_frame_sequence_custom = new wxTextCtrl(m_parent, wxID_ANY, "", wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER);
+    m_text_frame_sequence_custom = new wxTextCtrl(m_parent, wxID_ANY, "", wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER);
+    m_text_frame_sequence_custom->Enable(false);
+    m_text_frame_sequence_custom->Bind(wxEVT_TEXT_ENTER, [this](wxCommandEvent& event) {
+        UpdateAnimationTable();
+        });
     // ComboBox for Possible Frame Timings
     m_combo_frame_timing = new wxComboBox(m_parent, wxID_ANY, "default", wxDefaultPosition, wxDefaultSize, m_lManager->getFrameTimingNames(), wxCB_READONLY);
     m_combo_frame_timing->Bind(wxEVT_COMBOBOX, [this](wxCommandEvent& event) {
         wxString selectedTiming = m_combo_frame_timing->GetValue();
         UpdateAnimationTable();
+        m_text_frame_timing_custom->Enable(selectedTiming == "custom");  // Enable if custom timing is selected
         m_parent->SetStatusText("Selected Frame Timing: " + selectedTiming);
         });
     m_combo_frame_timing->Append("custom");
     // TextControl for Custom Frame Timing
-    wxTextCtrl* text_frame_timing_custom = new wxTextCtrl(m_parent, wxID_ANY, "", wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER);
+    m_text_frame_timing_custom = new wxTextCtrl(m_parent, wxID_ANY, "", wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER);
+    m_text_frame_timing_custom->Enable(false);
+    m_text_frame_timing_custom->Bind(wxEVT_TEXT_ENTER, [this](wxCommandEvent& event) {
+        UpdateAnimationTable();
+        });
     // ListView for Frame and Delay Selection
     m_listview_animation = new wxListView(m_parent, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLC_REPORT);
     m_listview_animation->AppendColumn("Frame", wxLIST_FORMAT_LEFT, 75);
@@ -50,11 +60,11 @@ void AnimationControls::CreateControls()
         wxBoxSizer* sizer_frameOptions = new wxBoxSizer(wxVERTICAL);
             wxStaticBoxSizer* sizer_frameSequence = new wxStaticBoxSizer(wxVERTICAL, m_parent, "Frame Sequence:");
                 sizer_frameSequence->Add(m_combo_frame_sequence, 0, wxEXPAND | wxALL, 5);
-                sizer_frameSequence->Add(text_frame_sequence_custom, 0, wxEXPAND | wxALL, 5);
+                sizer_frameSequence->Add(m_text_frame_sequence_custom, 0, wxEXPAND | wxALL, 5);
             sizer_frameOptions->Add(sizer_frameSequence, 0, wxEXPAND | wxALL, 5);
             wxStaticBoxSizer* sizer_frameTiming = new wxStaticBoxSizer(wxVERTICAL, m_parent, "Frame Timing:");
                 sizer_frameTiming->Add(m_combo_frame_timing, 0, wxEXPAND | wxALL, 5);
-                sizer_frameTiming->Add(text_frame_timing_custom, 0, wxEXPAND | wxALL, 5);
+                sizer_frameTiming->Add(m_text_frame_timing_custom, 0, wxEXPAND | wxALL, 5);
             sizer_frameOptions->Add(sizer_frameTiming, 0, wxEXPAND | wxALL, 5);
         sizer_main->Add(sizer_frameOptions, 0, wxEXPAND | wxALL, 5);
 
@@ -71,8 +81,47 @@ wxArrayString AnimationControls::GetSelectedFrameSequence()
     {
         return m_lManager->getFrameSequence(m_combo_frame_sequence->GetValue()).frames;
     }
-    // Implement custom frame sequence parser
-    return wxArrayString();
+    else
+    {
+        return ParseCustomFrameSequence(m_text_frame_sequence_custom->GetValue());
+    }
+}
+
+std::vector<int> AnimationControls::GetSelectedFrameTiming(int frameCount)
+{
+    std::vector<int> frameTiming;
+    if (m_combo_frame_timing->GetValue() != "custom")
+    {
+        frameTiming = m_lManager->getFrameTiming(m_combo_frame_timing->GetValue());
+    }
+    else
+    {
+        wxStringTokenizer tokenizer(m_text_frame_timing_custom->GetValue(), ",");
+        
+        while (tokenizer.HasMoreTokens())
+        {
+            frameTiming.push_back(wxAtoi(tokenizer.GetNextToken()));
+        }
+        return frameTiming;
+    }
+
+    // Deal with no frameCount passed
+    if (frameCount == -1)
+    {
+        frameCount = GetSelectedFrameSequence().GetCount();
+    }
+
+    if (frameTiming.size() == 0)
+    {
+        m_parent->SetStatusText("No frame timing found!");
+        return frameTiming;
+    }
+    else if (frameTiming.size() != frameCount)
+    {
+        PropogateFrameTiming(frameTiming, frameCount);
+    }
+
+    return frameTiming;
 }
 
 void AnimationControls::UpdateControls()
@@ -87,6 +136,7 @@ void AnimationControls::OnFrameSequenceSelected(wxCommandEvent& event)
     wxString selectedSequence = m_combo_frame_sequence->GetValue();
     m_parent->SetStatusText("Selected Frame Sequence: " + selectedSequence);
     UpdateAnimationTable();
+    m_text_frame_sequence_custom->Enable(false);
 }
 
 void AnimationControls::OnFrameTimingSelected(wxCommandEvent& event)
@@ -94,6 +144,7 @@ void AnimationControls::OnFrameTimingSelected(wxCommandEvent& event)
     wxString selectedTiming = m_combo_frame_timing->GetValue();
     m_parent->SetStatusText("Selected Frame Timing: " + selectedTiming);
     UpdateAnimationTable();
+    m_text_frame_timing_custom->Enable(false);
 }
 
 void AnimationControls::UpdateFrameSequences()
@@ -112,22 +163,13 @@ void AnimationControls::UpdateFrameTimings()
 
 void AnimationControls::UpdateAnimationTable()
 {
-    FrameSequence frameSequence = m_lManager->getFrameSequence(m_combo_frame_sequence->GetValue());
-    if (frameSequence.frameCount == 0)
+    m_animationData.frameSequence = GetSelectedFrameSequence();  // Get the selected frame sequence, either from the combo box or the text control, add to m_animationData
+    if ((m_animationData.frameCount = m_animationData.frameSequence.GetCount()) == 0)  // Set the frame count to the number of frames in the sequence in m_animationData
     {
         wxLogError("No frames in sequence!");
         return;
     }
-    std::vector<int> frameTiming = m_lManager->getFrameTiming(m_combo_frame_timing->GetValue());
-    if (frameTiming.size() == 0)
-    {
-        m_parent->SetStatusText("No frame timing found!");
-        return;
-    }
-    else if (frameTiming.size() != frameSequence.frameCount)
-    {
-        PropogateFrameTiming(frameTiming, frameSequence.frameCount);
-    }
+    m_animationData.frameTiming = GetSelectedFrameTiming(m_animationData.frameCount);  // Get the selected frame timing, either from the combo box or the text control, add to m_animationData
     
     if (m_listview_generated == true)
     {
@@ -138,16 +180,48 @@ void AnimationControls::UpdateAnimationTable()
         m_listview_generated = true;
     }
 
-    for (int i = 0; i < frameSequence.frameCount; i++)
+    for (int i = 0; i < m_animationData.frameCount; i++)
     {
-            // Debug prints
-            std::cout << "i: " << i << ", frameCount: " << frameSequence.frameCount << std::endl;
-            std::cout << "frame: " << frameSequence.frames[i] << std::endl;
-            std::cout << "frameTiming: " << frameTiming[i] << std::endl;
-
-            m_listview_animation->InsertItem(i, frameSequence.frames[i]);
-            m_listview_animation->SetItem(i, 1, std::to_string(frameTiming[i]));
+        m_listview_animation->InsertItem(i, m_animationData.frameSequence[i]);
+        m_listview_animation->SetItem(i, 1, std::to_string(m_animationData.frameTiming[i]));
     }
+}
+
+wxArrayString AnimationControls::ParseCustomFrameSequence(wxString customSequence)
+{
+    wxArrayString frameSequence;
+    wxStringTokenizer tokenizer(customSequence, ",");
+    while (tokenizer.HasMoreTokens())
+    {
+        wxString token = tokenizer.GetNextToken();
+        if (token.Contains("-"))
+        {
+            wxStringTokenizer rangeTokenizer(token, "-");
+            wxString start = rangeTokenizer.GetNextToken();
+            wxString end = rangeTokenizer.GetNextToken();
+            int startInt = wxAtoi(start);
+            int endInt = wxAtoi(end);
+            if (startInt > endInt)
+            {
+                for (int i = startInt; i >= endInt; i--)
+                {
+                    frameSequence.Add(wxString::Format("%d", i));
+                }
+            }
+            else
+            {
+                for (int i = startInt; i <= endInt; i++)
+                {
+                    frameSequence.Add(wxString::Format("%d", i));
+                }
+            }
+        }
+        else
+        {
+            frameSequence.Add(token);
+        }
+    }
+    return frameSequence;
 }
 
 void AnimationControls::PropogateFrameTiming(std::vector<int>& frameTiming, int frameCount)
@@ -159,7 +233,7 @@ void AnimationControls::PropogateFrameTiming(std::vector<int>& frameTiming, int 
     }
     else if (frameTiming.size() > frameCount)
     {
-        wxLogError("Too many frame timings!");
+        frameTiming.resize(frameCount);
         return;
     }
     else if (frameTiming.size() < frameCount)
