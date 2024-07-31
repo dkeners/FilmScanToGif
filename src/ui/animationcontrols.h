@@ -6,14 +6,7 @@
 #include <wx/tokenzr.h>
 
 #include "../tools/layoutmanager.h"
-#include "../tools/animator.h"
-
-struct AnimationData
-{
-    int frameCount;
-    wxArrayString frameSequence;
-    std::vector<int> frameTiming;
-};
+#include "../tools/animationdata.h"
 
 class AnimationControls
 {

@@ -6,7 +6,7 @@
 #include <wx/statline.h>
 
 #include "../tools/animator.h"
-#include "animationcontrols.h"
+#include "../tools/animationdata.h"
 
 class ExportDialog : public wxDialog
 {

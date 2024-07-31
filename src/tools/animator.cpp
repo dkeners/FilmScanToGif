@@ -98,7 +98,7 @@ namespace Animator {
     const int ExportAnimation(LayoutManager* lManager, wxString frameSequenceName, ExportModifier modifiers, wxColour bgColor)
     {
         // Get the frame sequence
-        AnimationData animationData;
+        AnimationData animationData = AnimationData();
         FrameSequence seq = lManager->getFrameSequence(frameSequenceName);
         animationData.frameCount = seq.frames.GetCount();
         animationData.frameSequence = seq.frames;
