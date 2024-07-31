@@ -227,7 +227,7 @@ MyFrame::MyFrame() : wxFrame(NULL, wxID_ANY, "FilmScanMotion")
     // ANIMATION CONTROLS
     m_animation_controls.CreateControls();
     // Button to Align Frames
-    wxButton* button_align_anim = new wxButton(this, wxID_ANY, "Align - Single", wxDefaultPosition, wxSize(100, 40));
+    wxButton* button_align_anim = new wxButton(this, wxID_ANY, "Align Images", wxDefaultPosition, wxSize(100, 40));
     button_align_anim->Bind(wxEVT_COMMAND_BUTTON_CLICKED, [this](wxCommandEvent& event) {
         if (!image.IsOk()) {
             wxLogError("No image loaded!");
@@ -242,7 +242,7 @@ MyFrame::MyFrame() : wxFrame(NULL, wxID_ANY, "FilmScanMotion")
 
         });
     // Button to Export Animation
-    wxButton* button_export_anim = new wxButton(this, wxID_ANY, "Export\nAnimation", wxDefaultPosition, wxSize(100, 40));
+    wxButton* button_export_anim = new wxButton(this, wxID_ANY, "Export", wxDefaultPosition, wxSize(100, 40));
     button_export_anim->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &MyFrame::OnExport, this);
     // END ANIMATION CONTROLS
 
