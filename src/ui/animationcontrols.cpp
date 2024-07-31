@@ -7,7 +7,6 @@ AnimationControls::AnimationControls(wxFrame* parent, LayoutManager* layoutManag
 
 AnimationControls::~AnimationControls()
 {
-    delete sizer_main;
 }
 
 void AnimationControls::CreateControls()
