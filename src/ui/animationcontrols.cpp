@@ -89,12 +89,18 @@ wxArrayString AnimationControls::GetSelectedFrameSequence()
 
 std::vector<int> AnimationControls::GetSelectedFrameTiming(int frameCount)
 {
-    std::vector<int> frameTiming;
+    // Deal with no frameCount passed
+    if (frameCount == -1)
+    {
+        frameCount = GetSelectedFrameSequence().GetCount();
+    }
+
+    std::vector<int> frameTiming = std::vector<int>();
     if (m_combo_frame_timing->GetValue() != "custom")
     {
         frameTiming = m_lManager->getFrameTiming(m_combo_frame_timing->GetValue());
     }
-    else
+    else if (m_text_frame_timing_custom->GetValue() != "")
     {
         wxStringTokenizer tokenizer(m_text_frame_timing_custom->GetValue(), ",");
         
@@ -102,21 +108,20 @@ std::vector<int> AnimationControls::GetSelectedFrameTiming(int frameCount)
         {
             frameTiming.push_back(wxAtoi(tokenizer.GetNextToken()));
         }
-        return frameTiming;
     }
-
-    // Deal with no frameCount passed
-    if (frameCount == -1)
+    else
     {
-        frameCount = GetSelectedFrameSequence().GetCount();
+        m_parent->SetStatusText("No frame timing found! Defaulting to 100ms.");
+        frameTiming.resize(frameCount, 100);
     }
 
     if (frameTiming.size() == 0)
     {
-        m_parent->SetStatusText("No frame timing found!");
-        return frameTiming;
+        m_parent->SetStatusText("No frame timing found! Defaulting to 100ms.");
+        frameTiming.resize(frameCount, 100);
     }
-    else if (frameTiming.size() != frameCount)
+
+    if (frameTiming.size() != frameCount)
     {
         PropogateFrameTiming(frameTiming, frameCount);
     }
@@ -243,5 +248,6 @@ void AnimationControls::PropogateFrameTiming(std::vector<int>& frameTiming, int 
         {
             frameTiming.push_back(lastTiming);
         }
+        return;
     }
 }
