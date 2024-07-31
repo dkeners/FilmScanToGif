@@ -52,7 +52,7 @@ void AnimationControls::CreateControls()
         m_parent->SetStatusText("Selected Frame: " + m_listview_animation->GetItemText(event.GetIndex()) + " with Delay: " + m_listview_animation->GetItemText(event.GetIndex(), 1));
         });
     // Checkbox for Single Focus Point
-    m_checkbox_single_focus = new wxCheckBox(m_parent, wxID_ANY, "Single Focus Point?");
+    m_checkbox_single_focus = new wxCheckBox(m_parent, wxID_ANY, "Set Moving Focus Point");
     m_checkbox_single_focus->SetValue(true);
     
     // CREATE SIZERS
@@ -60,12 +60,12 @@ void AnimationControls::CreateControls()
         wxBoxSizer* sizer_frameOptions = new wxBoxSizer(wxVERTICAL);
             wxStaticBoxSizer* sizer_frameSequence = new wxStaticBoxSizer(wxVERTICAL, m_parent, "Frame Sequence:");
                 sizer_frameSequence->Add(m_combo_frame_sequence, 0, wxEXPAND | wxALL, 5);
-                sizer_frameSequence->Add(m_text_frame_sequence_custom, 0, wxEXPAND | wxALL, 5);
-            sizer_frameOptions->Add(sizer_frameSequence, 0, wxEXPAND | wxALL, 5);
+                sizer_frameSequence->Add(m_text_frame_sequence_custom, 0, wxEXPAND | wxRIGHT | wxBOTTOM | wxLEFT, 5);
+            sizer_frameOptions->Add(sizer_frameSequence, 0, wxEXPAND | wxALL, 0);
             wxStaticBoxSizer* sizer_frameTiming = new wxStaticBoxSizer(wxVERTICAL, m_parent, "Frame Timing:");
                 sizer_frameTiming->Add(m_combo_frame_timing, 0, wxEXPAND | wxALL, 5);
-                sizer_frameTiming->Add(m_text_frame_timing_custom, 0, wxEXPAND | wxALL, 5);
-            sizer_frameOptions->Add(sizer_frameTiming, 0, wxEXPAND | wxALL, 5);
+                sizer_frameTiming->Add(m_text_frame_timing_custom, 0, wxEXPAND | wxRIGHT | wxBOTTOM | wxLEFT, 5);
+            sizer_frameOptions->Add(sizer_frameTiming, 0, wxEXPAND | wxALL, 0);
         sizer_main->Add(sizer_frameOptions, 0, wxEXPAND | wxALL, 5);
 
         sizer_main->Add(m_listview_animation, 0, wxEXPAND | wxALL, 5);
